@@ -1,0 +1,181 @@
+package com.tenantcollective.rentnegotiation.controller;
+
+import com.tenantcollective.rentnegotiation.model.ApiResponse;
+import com.tenantcollective.rentnegotiation.model.AnonymousReport;
+import com.tenantcollective.rentnegotiation.model.Vote;
+import com.tenantcollective.rentnegotiation.service.AnonymousReportService;
+import com.tenantcollective.rentnegotiation.service.VoteService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/admin")
+@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000", "http://172.20.196.193:3000"})
+public class AdminController {
+    
+    private final AnonymousReportService anonymousReportService;
+    private final VoteService voteService;
+    
+    @Autowired
+    public AdminController(AnonymousReportService anonymousReportService, VoteService voteService) {
+        this.anonymousReportService = anonymousReportService;
+        this.voteService = voteService;
+    }
+    
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> adminLogin(@RequestBody Map<String, String> loginRequest) {
+        try {
+            String adminId = loginRequest.get("adminId");
+            String password = loginRequest.get("password");
+            
+            // 간단한 관리자 인증 (실제로는 보안 강화 필요)
+            if ("admin".equals(adminId) && "admin123".equals(password)) {
+                Map<String, Object> responseData = new HashMap<>();
+                responseData.put("id", "admin_001");
+                responseData.put("nickname", "관리자");
+                responseData.put("address", "시스템 관리자");
+                
+                return ResponseEntity.ok(new ApiResponse<>(true, responseData));
+            } else {
+                return ResponseEntity.badRequest()
+                        .body(new ApiResponse<>(false, null, "관리자 인증에 실패했습니다"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>(false, null, "관리자 로그인 실패: " + e.getMessage()));
+        }
+    }
+    
+    @GetMapping("/reports")
+    public ResponseEntity<ApiResponse<List<AnonymousReport>>> getAllReports() {
+        try {
+            List<AnonymousReport> reports = anonymousReportService.getAllReports();
+            return ResponseEntity.ok(new ApiResponse<>(true, reports));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>(false, null, "신고 목록 조회 실패: " + e.getMessage()));
+        }
+    }
+    
+    @PutMapping("/reports/{reportId}/verify")
+    public ResponseEntity<ApiResponse<String>> verifyReport(@PathVariable String reportId, @RequestBody Map<String, Boolean> request) {
+        try {
+            Boolean verified = request.get("verified");
+            if (verified == null) {
+                return ResponseEntity.badRequest()
+                        .body(new ApiResponse<>(false, null, "검증 상태가 필요합니다"));
+            }
+            
+            boolean success = anonymousReportService.updateReportVerification(reportId, verified);
+            if (success) {
+                return ResponseEntity.ok(new ApiResponse<>(true, "신고 검증 상태가 업데이트되었습니다"));
+            } else {
+                return ResponseEntity.badRequest()
+                        .body(new ApiResponse<>(false, null, "신고를 찾을 수 없습니다"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>(false, null, "신고 검증 실패: " + e.getMessage()));
+        }
+    }
+    
+    @GetMapping("/votes")
+    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getAllVotes() {
+        try {
+            // 임시 투표 데이터 (실제로는 데이터베이스에서 조회)
+            List<Map<String, Object>> votes = new ArrayList<>();
+            
+            // 예시 투표 데이터
+            Map<String, Object> vote1 = new HashMap<>();
+            vote1.put("id", "vote_001");
+            vote1.put("title", "월세 인상 제한에 대한 의견");
+            vote1.put("description", "올해 월세 인상을 3% 이하로 제한하는 것에 대한 의견을 듣고자 합니다.");
+            vote1.put("options", List.of("찬성", "반대", "보류"));
+            vote1.put("createdAt", java.time.LocalDateTime.now().minusDays(1).toString());
+            vote1.put("deadline", java.time.LocalDateTime.now().plusDays(6).toString());
+            vote1.put("status", "active");
+            votes.add(vote1);
+            
+            return ResponseEntity.ok(new ApiResponse<>(true, votes));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>(false, null, "투표 목록 조회 실패: " + e.getMessage()));
+        }
+    }
+    
+    @GetMapping("/votes/{voteId}/results")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getVoteResults(@PathVariable String voteId) {
+        try {
+            // 임시 투표 결과 데이터 (실제로는 데이터베이스에서 조회)
+            Map<String, Object> results = new HashMap<>();
+            results.put("voteId", voteId);
+            results.put("totalVotes", 15);
+            results.put("results", Map.of(
+                "찬성", 8,
+                "반대", 5,
+                "보류", 2
+            ));
+            results.put("percentages", Map.of(
+                "찬성", 53.3,
+                "반대", 33.3,
+                "보류", 13.4
+            ));
+            results.put("lastUpdated", java.time.LocalDateTime.now().toString());
+            
+            return ResponseEntity.ok(new ApiResponse<>(true, results));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>(false, null, "투표 결과 조회 실패: " + e.getMessage()));
+        }
+    }
+    
+    @PostMapping("/votes")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> createVote(@RequestBody Map<String, Object> voteRequest) {
+        try {
+            String title = (String) voteRequest.get("title");
+            String description = (String) voteRequest.get("description");
+            @SuppressWarnings("unchecked")
+            List<String> options = (List<String>) voteRequest.get("options");
+            String deadlineStr = (String) voteRequest.get("deadline");
+            
+            if (title == null || description == null || options == null || options.isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(new ApiResponse<>(false, null, "투표 정보가 부족합니다"));
+            }
+            
+            // 기한 처리 (기본값: 7일 후)
+            java.time.LocalDateTime deadline;
+            if (deadlineStr != null && !deadlineStr.isEmpty()) {
+                try {
+                    deadline = java.time.LocalDateTime.parse(deadlineStr);
+                } catch (Exception e) {
+                    return ResponseEntity.badRequest()
+                            .body(new ApiResponse<>(false, null, "기한 형식이 올바르지 않습니다 (YYYY-MM-DDTHH:mm)"));
+                }
+            } else {
+                deadline = java.time.LocalDateTime.now().plusDays(7); // 기본 7일
+            }
+            
+            // 투표 템플릿 정보를 Map으로 반환
+            Map<String, Object> voteTemplate = new HashMap<>();
+            voteTemplate.put("id", "vote_" + System.currentTimeMillis());
+            voteTemplate.put("title", title);
+            voteTemplate.put("description", description);
+            voteTemplate.put("options", options);
+            voteTemplate.put("createdAt", java.time.LocalDateTime.now().toString());
+            voteTemplate.put("deadline", deadline.toString());
+            voteTemplate.put("status", "active");
+            
+            return ResponseEntity.ok(new ApiResponse<>(true, voteTemplate));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>(false, null, "투표 생성 실패: " + e.getMessage()));
+        }
+    }
+}

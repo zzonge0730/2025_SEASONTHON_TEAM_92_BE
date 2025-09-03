@@ -1,0 +1,90 @@
+[[1;34mINFO[m] Scanning for projects...
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m---------------< [0;36mcom.tenantcollective:rent-negotiation[0;1m >----------------[m
+[[1;34mINFO[m] [1mBuilding rent-negotiation 0.0.1-SNAPSHOT[m
+[[1;34mINFO[m] [1m--------------------------------[ jar ]---------------------------------[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m>>> [0;32mspring-boot-maven-plugin:3.2.0:run[m [1m(default-cli)[0;1m > [0;1mtest-compile[m @ [36mrent-negotiation[0;1m >>>[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-resources-plugin:3.3.1:resources[m [1m(default-resources)[m @ [36mrent-negotiation[0;1m ---[m
+[[1;34mINFO[m] Copying 1 resource from src/main/resources to target/classes
+[[1;34mINFO[m] Copying 0 resource from src/main/resources to target/classes
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-compiler-plugin:3.11.0:compile[m [1m(default-compile)[m @ [36mrent-negotiation[0;1m ---[m
+[[1;34mINFO[m] Nothing to compile - all classes are up to date
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-resources-plugin:3.3.1:testResources[m [1m(default-testResources)[m @ [36mrent-negotiation[0;1m ---[m
+[[1;34mINFO[m] skip non existing resourceDirectory /home/rkddngpr/house/backend/src/test/resources
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-compiler-plugin:3.11.0:testCompile[m [1m(default-testCompile)[m @ [36mrent-negotiation[0;1m ---[m
+[[1;34mINFO[m] No sources to compile
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m<<< [0;32mspring-boot-maven-plugin:3.2.0:run[m [1m(default-cli)[0;1m < [0;1mtest-compile[m @ [36mrent-negotiation[0;1m <<<[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mspring-boot-maven-plugin:3.2.0:run[m [1m(default-cli)[m @ [36mrent-negotiation[0;1m ---[m
+[[1;34mINFO[m] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.0)
+
+2025-09-04T01:12:19.488+09:00  INFO 37085 --- [rent-negotiation] [           main] c.t.r.RentNegotiationApplication         : Starting RentNegotiationApplication using Java 17.0.16 with PID 37085 (/home/rkddngpr/house/backend/target/classes started by rkddngpr in /home/rkddngpr/house/backend)
+2025-09-04T01:12:19.490+09:00  INFO 37085 --- [rent-negotiation] [           main] c.t.r.RentNegotiationApplication         : No active profile set, falling back to 1 default profile: "default"
+2025-09-04T01:12:20.027+09:00  INFO 37085 --- [rent-negotiation] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8891 (http)
+2025-09-04T01:12:20.032+09:00  INFO 37085 --- [rent-negotiation] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-09-04T01:12:20.032+09:00  INFO 37085 --- [rent-negotiation] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.16]
+2025-09-04T01:12:20.062+09:00  INFO 37085 --- [rent-negotiation] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-09-04T01:12:20.063+09:00  INFO 37085 --- [rent-negotiation] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 549 ms
+=== Real Estate API Information ===
+API URL: null
+Provider: 한국부동산원 (공공기관)
+Data Source: 정부 공공데이터포털
+Data Type: 단독/다가구 전월세 실거래가
+================================
+2025-09-04T01:12:20.291+09:00  INFO 37085 --- [rent-negotiation] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8891 (http) with context path ''
+2025-09-04T01:12:20.296+09:00  INFO 37085 --- [rent-negotiation] [           main] c.t.r.RentNegotiationApplication         : Started RentNegotiationApplication in 1.024 seconds (process running for 1.203)
+2025-09-04T01:12:23.012+09:00  INFO 37085 --- [rent-negotiation] [0.0-8891-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-09-04T01:12:23.012+09:00  INFO 37085 --- [rent-negotiation] [0.0-8891-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-09-04T01:12:23.013+09:00  INFO 37085 --- [rent-negotiation] [0.0-8891-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+Looking for neighborhood: 구영리 
+Found lawd code: 11200 for 구영리 
+API URL: https://apis.data.go.kr/1613000/RTMSDataSvcSHRent?serviceKey=e20aoTYyOLpe4UPR3I70w%2BQLG5abe%2FL7o0QOJ4bOpnyRTZcTFrYAKb%2FMVp%2B%2FlNY8IMzLLdvjvf6BRGb7Tpa2OA%3D%3D&LAWD_CD=11200&DEAL_YMD=202509&numOfRows=1000
+Error fetching real estate data: 500 Internal Server Error: "<?xml version="1.0" encoding="UTF-8"?><EOL><soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><EOL>    <soapenv:Body><EOL>        <soapenv:Fault><EOL>            <faultcode>soapenv:Server</faultcode><EOL>            <faultstring>Policy Falsified</faultstring><EOL>            <faultactor>https://apis.data.go.kr/1613000/RTMSDataSvcSHRent?serviceKey=e20aoTYyOLpe4UPR3I70w%252BQLG5abe%252FL7o0QOJ4bOpnyRTZcTFrYAKb%252FMVp%252B%252FlNY8IMzLLdvjvf6BRGb7Tpa2OA%253D%253D&amp;LAWD_CD=11200&amp;DEAL_YMD=202509&amp;numOfRows=1000</faultactor><EOL>            <detail><EOL>                <l7:policyResult<EOL>                    status="Service Not Found.  The request may have been sent to an invalid URL, or intended for an unsupported operation." xmlns:l7="http://www.layer7tech.com/ws/policy/fault"/><EOL>            </detail><EOL>        </soapenv:Fault><EOL>    </soapenv:Body><EOL></soapenv:Envelope><EOL>"
+API URL: https://apis.data.go.kr/1613000/RTMSDataSvcSHRent?serviceKey=e20aoTYyOLpe4UPR3I70w%2BQLG5abe%2FL7o0QOJ4bOpnyRTZcTFrYAKb%2FMVp%2B%2FlNY8IMzLLdvjvf6BRGb7Tpa2OA%3D%3D&LAWD_CD=11200&DEAL_YMD=202508&numOfRows=1000
+Error fetching real estate data: 500 Internal Server Error: "<?xml version="1.0" encoding="UTF-8"?><EOL><soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><EOL>    <soapenv:Body><EOL>        <soapenv:Fault><EOL>            <faultcode>soapenv:Server</faultcode><EOL>            <faultstring>Policy Falsified</faultstring><EOL>            <faultactor>https://apis.data.go.kr/1613000/RTMSDataSvcSHRent?serviceKey=e20aoTYyOLpe4UPR3I70w%252BQLG5abe%252FL7o0QOJ4bOpnyRTZcTFrYAKb%252FMVp%252B%252FlNY8IMzLLdvjvf6BRGb7Tpa2OA%253D%253D&amp;LAWD_CD=11200&amp;DEAL_YMD=202508&amp;numOfRows=1000</faultactor><EOL>            <detail><EOL>                <l7:policyResult<EOL>                    status="Service Not Found.  The request may have been sent to an invalid URL, or intended for an unsupported operation." xmlns:l7="http://www.layer7tech.com/ws/policy/fault"/><EOL>            </detail><EOL>        </soapenv:Fault><EOL>    </soapenv:Body><EOL></soapenv:Envelope><EOL>"
+API URL: https://apis.data.go.kr/1613000/RTMSDataSvcSHRent?serviceKey=e20aoTYyOLpe4UPR3I70w%2BQLG5abe%2FL7o0QOJ4bOpnyRTZcTFrYAKb%2FMVp%2B%2FlNY8IMzLLdvjvf6BRGb7Tpa2OA%3D%3D&LAWD_CD=11200&DEAL_YMD=202507&numOfRows=1000
+Error fetching real estate data: 500 Internal Server Error: "<?xml version="1.0" encoding="UTF-8"?><EOL><soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><EOL>    <soapenv:Body><EOL>        <soapenv:Fault><EOL>            <faultcode>soapenv:Server</faultcode><EOL>            <faultstring>Policy Falsified</faultstring><EOL>            <faultactor>https://apis.data.go.kr/1613000/RTMSDataSvcSHRent?serviceKey=e20aoTYyOLpe4UPR3I70w%252BQLG5abe%252FL7o0QOJ4bOpnyRTZcTFrYAKb%252FMVp%252B%252FlNY8IMzLLdvjvf6BRGb7Tpa2OA%253D%253D&amp;LAWD_CD=11200&amp;DEAL_YMD=202507&amp;numOfRows=1000</faultactor><EOL>            <detail><EOL>                <l7:policyResult<EOL>                    status="Service Not Found.  The request may have been sent to an invalid URL, or intended for an unsupported operation." xmlns:l7="http://www.layer7tech.com/ws/policy/fault"/><EOL>            </detail><EOL>        </soapenv:Fault><EOL>    </soapenv:Body><EOL></soapenv:Envelope><EOL>"
+Creating dummy market data for: 구영리 
+Market data for 구영리 : Rent=85.0, Deposit=650.0
+Looking for neighborhood: 지곡동
+No lawd code found for: 지곡동
+Creating dummy market data for: 지곡동
+Market data for 지곡동: Rent=45.0, Deposit=300.0
+Looking for neighborhood: 동자동
+Found lawd code: 11110 for 동자동
+API URL: https://apis.data.go.kr/1613000/RTMSDataSvcSHRent?serviceKey=e20aoTYyOLpe4UPR3I70w%2BQLG5abe%2FL7o0QOJ4bOpnyRTZcTFrYAKb%2FMVp%2B%2FlNY8IMzLLdvjvf6BRGb7Tpa2OA%3D%3D&LAWD_CD=11110&DEAL_YMD=202509&numOfRows=1000
+Error fetching real estate data: 500 Internal Server Error: "<?xml version="1.0" encoding="UTF-8"?><EOL><soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><EOL>    <soapenv:Body><EOL>        <soapenv:Fault><EOL>            <faultcode>soapenv:Server</faultcode><EOL>            <faultstring>Policy Falsified</faultstring><EOL>            <faultactor>https://apis.data.go.kr/1613000/RTMSDataSvcSHRent?serviceKey=e20aoTYyOLpe4UPR3I70w%252BQLG5abe%252FL7o0QOJ4bOpnyRTZcTFrYAKb%252FMVp%252B%252FlNY8IMzLLdvjvf6BRGb7Tpa2OA%253D%253D&amp;LAWD_CD=11110&amp;DEAL_YMD=202509&amp;numOfRows=1000</faultactor><EOL>            <detail><EOL>                <l7:policyResult<EOL>                    status="Service Not Found.  The request may have been sent to an invalid URL, or intended for an unsupported operation." xmlns:l7="http://www.layer7tech.com/ws/policy/fault"/><EOL>            </detail><EOL>        </soapenv:Fault><EOL>    </soapenv:Body><EOL></soapenv:Envelope><EOL>"
+API URL: https://apis.data.go.kr/1613000/RTMSDataSvcSHRent?serviceKey=e20aoTYyOLpe4UPR3I70w%2BQLG5abe%2FL7o0QOJ4bOpnyRTZcTFrYAKb%2FMVp%2B%2FlNY8IMzLLdvjvf6BRGb7Tpa2OA%3D%3D&LAWD_CD=11110&DEAL_YMD=202508&numOfRows=1000
+Error fetching real estate data: 500 Internal Server Error: "<?xml version="1.0" encoding="UTF-8"?><EOL><soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><EOL>    <soapenv:Body><EOL>        <soapenv:Fault><EOL>            <faultcode>soapenv:Server</faultcode><EOL>            <faultstring>Policy Falsified</faultstring><EOL>            <faultactor>https://apis.data.go.kr/1613000/RTMSDataSvcSHRent?serviceKey=e20aoTYyOLpe4UPR3I70w%252BQLG5abe%252FL7o0QOJ4bOpnyRTZcTFrYAKb%252FMVp%252B%252FlNY8IMzLLdvjvf6BRGb7Tpa2OA%253D%253D&amp;LAWD_CD=11110&amp;DEAL_YMD=202508&amp;numOfRows=1000</faultactor><EOL>            <detail><EOL>                <l7:policyResult<EOL>                    status="Service Not Found.  The request may have been sent to an invalid URL, or intended for an unsupported operation." xmlns:l7="http://www.layer7tech.com/ws/policy/fault"/><EOL>            </detail><EOL>        </soapenv:Fault><EOL>    </soapenv:Body><EOL></soapenv:Envelope><EOL>"
+API URL: https://apis.data.go.kr/1613000/RTMSDataSvcSHRent?serviceKey=e20aoTYyOLpe4UPR3I70w%2BQLG5abe%2FL7o0QOJ4bOpnyRTZcTFrYAKb%2FMVp%2B%2FlNY8IMzLLdvjvf6BRGb7Tpa2OA%3D%3D&LAWD_CD=11110&DEAL_YMD=202507&numOfRows=1000
+Error fetching real estate data: 500 Internal Server Error: "<?xml version="1.0" encoding="UTF-8"?><EOL><soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><EOL>    <soapenv:Body><EOL>        <soapenv:Fault><EOL>            <faultcode>soapenv:Server</faultcode><EOL>            <faultstring>Policy Falsified</faultstring><EOL>            <faultactor>https://apis.data.go.kr/1613000/RTMSDataSvcSHRent?serviceKey=e20aoTYyOLpe4UPR3I70w%252BQLG5abe%252FL7o0QOJ4bOpnyRTZcTFrYAKb%252FMVp%252B%252FlNY8IMzLLdvjvf6BRGb7Tpa2OA%253D%253D&amp;LAWD_CD=11110&amp;DEAL_YMD=202507&amp;numOfRows=1000</faultactor><EOL>            <detail><EOL>                <l7:policyResult<EOL>                    status="Service Not Found.  The request may have been sent to an invalid URL, or intended for an unsupported operation." xmlns:l7="http://www.layer7tech.com/ws/policy/fault"/><EOL>            </detail><EOL>        </soapenv:Fault><EOL>    </soapenv:Body><EOL></soapenv:Envelope><EOL>"
+Creating dummy market data for: 동자동
+Market data for 동자동: Rent=95.0, Deposit=800.0
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] [1;31mBUILD FAILURE[m
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] Total time:  01:34 min
+[[1;34mINFO[m] Finished at: 2025-09-04T01:13:52+09:00
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;31mERROR[m] Failed to execute goal [32morg.springframework.boot:spring-boot-maven-plugin:3.2.0:run[m [1m(default-cli)[m on project [36mrent-negotiation[m: [1;31mProcess terminated with exit code: 143[m -> [1m[Help 1][m
+[[1;31mERROR[m] 
+[[1;31mERROR[m] To see the full stack trace of the errors, re-run Maven with the [1m-e[m switch.
+[[1;31mERROR[m] Re-run Maven using the [1m-X[m switch to enable full debug logging.
+[[1;31mERROR[m] 
+[[1;31mERROR[m] For more information about the errors and possible solutions, please read the following articles:
+[[1;31mERROR[m] [1m[Help 1][m http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
