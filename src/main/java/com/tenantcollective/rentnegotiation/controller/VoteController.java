@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000", "http://172.20.196.193:3000"})
+@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000", "http://172.20.196.193:3000", "https://houselent.vercel.app", "https://houselent-3srqcm2ee-woohyeok-kangs-projects.vercel.app"})
 public class VoteController {
     
     private final VoteService voteService;
