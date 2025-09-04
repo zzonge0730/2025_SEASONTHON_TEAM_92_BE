@@ -1,93 +1,102 @@
 package com.tenantcollective.rentnegotiation.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class AnonymousReport {
-    private String id;
-    
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime timestamp;
-    
-    @NotBlank(message = "Building name is required")
-    private String buildingName;
-    
-    @NotBlank(message = "Report content is required")
-    @Size(max = 1000, message = "Report must be less than 1000 characters")
-    private String report;
-    
-    private String neighborhood;
-    private String city;
-    private Boolean verified = false;
+    private String reportId;
+    private String title;
+    private String summary;
+    private LocalDateTime createdAt;
+    private DataReliability dataReliability;
+    private List<NegotiationCard> negotiationCards;
+    private String negotiationScenario;
+    private double successRate;
+    private int accessCount;
+    private LocalDateTime lastAccessedAt;
 
     // Constructors
-    public AnonymousReport() {
-        this.timestamp = LocalDateTime.now();
-    }
-
-    public AnonymousReport(String buildingName, String report, String neighborhood, String city) {
-        this();
-        this.buildingName = buildingName;
-        this.report = report;
-        this.neighborhood = neighborhood;
-        this.city = city;
-    }
+    public AnonymousReport() {}
 
     // Getters and Setters
-    public String getId() {
-        return id;
+    public String getReportId() {
+        return reportId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setReportId(String reportId) {
+        this.reportId = reportId;
     }
 
-    public LocalDateTime getTimestamp() {
-        return timestamp;
+    public String getTitle() {
+        return title;
     }
 
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public String getBuildingName() {
-        return buildingName;
+    public String getSummary() {
+        return summary;
     }
 
-    public void setBuildingName(String buildingName) {
-        this.buildingName = buildingName;
+    public void setSummary(String summary) {
+        this.summary = summary;
     }
 
-    public String getReport() {
-        return report;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setReport(String report) {
-        this.report = report;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public String getNeighborhood() {
-        return neighborhood;
+    public DataReliability getDataReliability() {
+        return dataReliability;
     }
 
-    public void setNeighborhood(String neighborhood) {
-        this.neighborhood = neighborhood;
+    public void setDataReliability(DataReliability dataReliability) {
+        this.dataReliability = dataReliability;
     }
 
-    public String getCity() {
-        return city;
+    public List<NegotiationCard> getNegotiationCards() {
+        return negotiationCards;
     }
 
-    public void setCity(String city) {
-        this.city = city;
+    public void setNegotiationCards(List<NegotiationCard> negotiationCards) {
+        this.negotiationCards = negotiationCards;
     }
 
-    public Boolean getVerified() {
-        return verified;
+    public String getNegotiationScenario() {
+        return negotiationScenario;
     }
 
-    public void setVerified(Boolean verified) {
-        this.verified = verified;
+    public void setNegotiationScenario(String negotiationScenario) {
+        this.negotiationScenario = negotiationScenario;
+    }
+
+    public double getSuccessRate() {
+        return successRate;
+    }
+
+    public void setSuccessRate(double successRate) {
+        this.successRate = successRate;
+    }
+
+    public int getAccessCount() {
+        return accessCount;
+    }
+
+    public void setAccessCount(int accessCount) {
+        this.accessCount = accessCount;
+    }
+
+    public LocalDateTime getLastAccessedAt() {
+        return lastAccessedAt;
+    }
+
+    public void setLastAccessedAt(LocalDateTime lastAccessedAt) {
+        this.lastAccessedAt = lastAccessedAt;
     }
 }

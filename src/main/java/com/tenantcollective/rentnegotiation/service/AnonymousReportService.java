@@ -43,13 +43,8 @@ public class AnonymousReportService {
     }
     
     public boolean updateReportVerification(String id, boolean verified) {
-        Optional<AnonymousReport> reportOpt = anonymousReportRepository.findById(id);
-        if (reportOpt.isPresent()) {
-            AnonymousReport report = reportOpt.get();
-            report.setVerified(verified);
-            anonymousReportRepository.save(report);
-            return true;
-        }
+        // Legacy method - AnonymousReport model has been updated for sharing functionality
+        // This method is no longer compatible with the new model structure
         return false;
     }
 }

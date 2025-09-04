@@ -33,13 +33,41 @@ public class LetterService {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Group not found: " + request.getGroupId()));
         
-        // Generate sample pain points (in a real app, this would come from the actual tenant data)
-        String samplePainPoints = generateSamplePainPoints();
+        // Generate pain points from request or use sample data
+        String painPoints = generatePainPointsFromRequest(request);
+        if (painPoints == null || painPoints.trim().isEmpty()) {
+            painPoints = generateSamplePainPoints();
+        }
         
-        // Generate the letter
-        String generatedText = llmClient.generateLetter(targetGroup, request, samplePainPoints);
+        // Generate the letter using LLM
+        String generatedText = llmClient.generateLetter(targetGroup, request, painPoints);
         
-        return new LetterResponse(generatedText, 0, false); // No LLM used in this implementation
+        // Determine if LLM was actually used (check if it's a template or AI-generated)
+        boolean usedLlm = !generatedText.contains("관리자님") || generatedText.length() > 500;
+        int estimatedTokens = generatedText.length() / 4; // Rough estimation
+        
+        return new LetterResponse(generatedText, estimatedTokens, usedLlm);
+    }
+    
+    private String generatePainPointsFromRequest(LetterRequest request) {
+        List<String> painPoints = new ArrayList<>();
+        
+        // Add selected pain points from request
+        if (request.getSelectedPainPoints() != null && !request.getSelectedPainPoints().isEmpty()) {
+            painPoints.addAll(request.getSelectedPainPoints());
+        }
+        
+        // Add custom content if provided
+        if (request.getCustomContent() != null && !request.getCustomContent().trim().isEmpty()) {
+            painPoints.add(request.getCustomContent());
+        }
+        
+        // Add selected discussions if provided
+        if (request.getSelectedDiscussions() != null && !request.getSelectedDiscussions().isEmpty()) {
+            painPoints.addAll(request.getSelectedDiscussions());
+        }
+        
+        return painPoints.isEmpty() ? null : String.join(", ", painPoints);
     }
     
     private String generateSamplePainPoints() {

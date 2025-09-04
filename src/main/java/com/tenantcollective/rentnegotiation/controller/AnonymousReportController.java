@@ -26,7 +26,7 @@ public class AnonymousReportController {
     public ResponseEntity<ApiResponse<String>> createAnonymousReport(@Valid @RequestBody AnonymousReport report) {
         try {
             AnonymousReport savedReport = anonymousReportService.saveReport(report);
-            return ResponseEntity.ok(new ApiResponse<>(true, savedReport.getId()));
+            return ResponseEntity.ok(new ApiResponse<>(true, savedReport.getReportId()));
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse<>(false, null, "Failed to save anonymous report: " + e.getMessage()));

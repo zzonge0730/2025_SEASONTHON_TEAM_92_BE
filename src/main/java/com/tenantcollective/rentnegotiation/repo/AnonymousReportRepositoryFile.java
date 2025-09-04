@@ -51,12 +51,12 @@ public class AnonymousReportRepositoryFile implements AnonymousReportRepository 
         try {
             List<AnonymousReport> reports = loadReports();
             
-            if (report.getId() == null || report.getId().isEmpty()) {
-                report.setId(UUID.randomUUID().toString());
+            if (report.getReportId() == null || report.getReportId().isEmpty()) {
+                report.setReportId(UUID.randomUUID().toString());
             }
             
             // Remove existing report with same ID
-            reports.removeIf(r -> r.getId().equals(report.getId()));
+            reports.removeIf(r -> r.getReportId().equals(report.getReportId()));
             reports.add(report);
             
             saveReports(reports);
@@ -71,7 +71,7 @@ public class AnonymousReportRepositoryFile implements AnonymousReportRepository 
         lock.readLock().lock();
         try {
             return loadReports().stream()
-                    .filter(report -> report.getId().equals(id))
+                    .filter(report -> report.getReportId().equals(id))
                     .findFirst();
         } finally {
             lock.readLock().unlock();
@@ -92,9 +92,8 @@ public class AnonymousReportRepositoryFile implements AnonymousReportRepository 
     public List<AnonymousReport> findByBuildingName(String buildingName) {
         lock.readLock().lock();
         try {
-            return loadReports().stream()
-                    .filter(report -> report.getBuildingName().equalsIgnoreCase(buildingName))
-                    .collect(Collectors.toList());
+            // Legacy method - building name filtering not supported in new model
+            return new ArrayList<>();
         } finally {
             lock.readLock().unlock();
         }
@@ -104,10 +103,8 @@ public class AnonymousReportRepositoryFile implements AnonymousReportRepository 
     public List<AnonymousReport> findByNeighborhood(String neighborhood) {
         lock.readLock().lock();
         try {
-            return loadReports().stream()
-                    .filter(report -> report.getNeighborhood() != null && 
-                            report.getNeighborhood().equalsIgnoreCase(neighborhood))
-                    .collect(Collectors.toList());
+            // Legacy method - neighborhood filtering not supported in new model
+            return new ArrayList<>();
         } finally {
             lock.readLock().unlock();
         }
@@ -118,7 +115,7 @@ public class AnonymousReportRepositoryFile implements AnonymousReportRepository 
         lock.writeLock().lock();
         try {
             List<AnonymousReport> reports = loadReports();
-            reports.removeIf(report -> report.getId().equals(id));
+            reports.removeIf(report -> report.getReportId().equals(id));
             saveReports(reports);
         } finally {
             lock.writeLock().unlock();

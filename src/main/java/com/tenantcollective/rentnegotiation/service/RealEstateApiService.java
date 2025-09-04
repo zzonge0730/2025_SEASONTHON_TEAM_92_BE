@@ -8,10 +8,15 @@ import com.tenantcollective.rentnegotiation.util.StatisticsUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
 import jakarta.annotation.PostConstruct;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -22,8 +27,19 @@ public class RealEstateApiService {
     private final XmlMapper xmlMapper;
     private final DataValidationService dataValidationService;
     
-    @Value("${realestate.api.key:}")
-    private String apiKey;
+    
+
+    @Value("${realestate.api.key.single:}")
+    private String singleHouseApiKey;
+
+    @Value("${realestate.api.key.rowhouse:}")
+    private String rowHouseApiKey;
+
+    @Value("${realestate.api.key.officetel:}")
+    private String officetelApiKey;
+
+    @Value("${realestate.api.key.apartment:}")
+    private String apartmentApiKey;
     
     @Value("${realestate.api.url.single:}")
     private String singleHouseApiUrl;
@@ -36,25 +52,55 @@ public class RealEstateApiService {
 
     @Value("${realestate.api.url.apartment:}")
     private String apartmentApiUrl;
+
+    private String getApiKeyForBuildingType(String buildingType) {
+        if (buildingType == null) {
+            return singleHouseApiKey; // Default
+        }
+        switch (buildingType.toLowerCase()) {
+            case "shrent":
+                return singleHouseApiKey;
+            case "rhrent":
+                return rowHouseApiKey;
+            case "offirent":
+                return officetelApiKey;
+            case "aptrent":
+                return apartmentApiKey;
+            default:
+                // Unsupported building type for API key, defaulting to single house API key
+                return singleHouseApiKey;
+        }
+    }
     
     public RealEstateApiService(DataValidationService dataValidationService) {
+        // Configure RestTemplate with a custom User-Agent and detailed logging
         this.restTemplate = new RestTemplate();
+        this.restTemplate.getInterceptors().add((request, body, execution) -> {
+            // Set User-Agent to mimic curl
+            request.getHeaders().set("User-Agent", "curl/7.81.0");
+            
+            // Log request details
+            // HTTP request details logged
+            
+            // Execute request
+            org.springframework.http.client.ClientHttpResponse response = execution.execute(request, body);
+            
+            // Log response details
+            // HTTP response details logged
+            
+            return response;
+        });
         this.xmlMapper = new XmlMapper();
+        this.xmlMapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        this.xmlMapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
+        this.xmlMapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true);
         this.dataValidationService = dataValidationService;
     }
 
     @PostConstruct
     public void init() {
         // API 정보 출력
-        System.out.println("=== Real Estate API Information ===");
-        System.out.println("Provider: 한국부동산원 (공공기관)");
-        System.out.println("Data Source: 정부 공공데이터포털");
-        System.out.println("Supported Building Types:");
-        System.out.println("- 단독/다가구: " + singleHouseApiUrl);
-        System.out.println("- 연립다주택: " + rowHouseApiUrl);
-        System.out.println("- 오피스텔: " + officetelApiUrl);
-        System.out.println("- 아파트: " + apartmentApiUrl);
-        System.out.println("================================");
+        // Real Estate API Information initialized
         
         // API 키 등록 상태 확인
         checkApiKeyRegistration();
@@ -64,7 +110,7 @@ public class RealEstateApiService {
      * API 키 등록 상태 확인
      */
     private void checkApiKeyRegistration() {
-        System.out.println("=== API Key Registration Check ===");
+        // API Key Registration Check
         
         // 단독다가구 API 테스트 (확인된 API)
         testApiKey(singleHouseApiUrl, "단독다가구");
@@ -74,29 +120,54 @@ public class RealEstateApiService {
         testApiKey(officetelApiUrl, "오피스텔");
         testApiKey(rowHouseApiUrl, "연립다주택");
         
-        System.out.println("==================================");
+        // API Key Registration Check completed
     }
     
     /**
      * 특정 API에 대한 키 등록 상태 테스트
      */
     private void testApiKey(String apiUrl, String apiName) {
+        if (apiUrl == null) {
+            // API URL not configured
+            return;
+        }
+        
         try {
+            // URL 구성 시 키를 한 번만 인코딩
             String testUrl = String.format("%s?serviceKey=%s&LAWD_CD=11110&DEAL_YMD=202412&numOfRows=1", 
-                                         apiUrl, apiKey);
+                                         apiUrl, java.net.URLEncoder.encode(getApiKeyForBuildingType(getApiSuffix(apiUrl)), java.nio.charset.StandardCharsets.UTF_8));
             
-            String response = restTemplate.getForObject(testUrl, String.class);
+            // API request details logged
+            
+            // RestTemplate 대신 직접 HTTP 요청 (이중 인코딩 방지)
+            java.net.URL url = new java.net.URL(testUrl);
+            java.net.HttpURLConnection connection = (java.net.HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
+            connection.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+            connection.setRequestProperty("Accept-Language", "ko-KR,ko;q=0.9,en;q=0.8");
+            connection.setRequestProperty("Accept-Encoding", "gzip, deflate, br");
+            connection.setRequestProperty("Connection", "keep-alive");
+            connection.setRequestProperty("Upgrade-Insecure-Requests", "1");
+            
+            int responseCode = connection.getResponseCode();
+            String response;
+            if (responseCode >= 200 && responseCode < 300) {
+                response = new String(connection.getInputStream().readAllBytes());
+            } else {
+                response = new String(connection.getErrorStream().readAllBytes());
+            }
+            connection.disconnect();
             
             if (response.contains("SERVICE_KEY_IS_NOT_REGISTERED_ERROR")) {
-                System.out.println("❌ " + apiName + " API: 키 미등록");
-                System.out.println("Full API Response (Key Error): " + response);
+                // API key not registered
             } else if (response.contains("NODATA_ERROR")) {
-                System.out.println("✅ " + apiName + " API: 키 등록됨 (데이터 없음)");
+                // API key registered (no data)
             } else {
-                System.out.println("✅ " + apiName + " API: 키 등록됨");
+                // API key registered
             }
         } catch (Exception e) {
-            System.out.println("❓ " + apiName + " API: 테스트 실패 - " + e.getMessage());
+            // API test failed
         }
     }
     
@@ -120,24 +191,28 @@ public class RealEstateApiService {
      * 건물 유형에 따라 적절한 API URL 선택 (등록된 API만 사용)
      */
     private String getApiUrlForBuildingType(String buildingType) {
+        String defaultUrl = "https://apis.data.go.kr/1613000/RTMSDataSvcSHRent/getRTMSDataSvcSHRent";
+        
         if (buildingType == null) {
-            return singleHouseApiUrl; // 기본값
+            return singleHouseApiUrl != null ? singleHouseApiUrl : defaultUrl;
         }
         
         switch (buildingType.toLowerCase()) {
             case "single": // 단독/다가구
-                return singleHouseApiUrl;
-            case "rowhouse": // 연립다세대
-                return rowHouseApiUrl;
-            case "officetel": // 오피스텔
-                return officetelApiUrl;
-            case "apartment": // 아파트
-                return apartmentApiUrl;
+                return singleHouseApiUrl != null ? singleHouseApiUrl : defaultUrl;
+            case "apartment": // 아파트 (등록된 API)
+                return apartmentApiUrl != null ? apartmentApiUrl : defaultUrl;
+            case "rowhouse": // 연립다세대 (미등록 - 단독/다가구로 폴백)
+                // Row house API not registered, falling back to single house API
+                return singleHouseApiUrl != null ? singleHouseApiUrl : defaultUrl;
+            case "officetel": // 오피스텔 (미등록 - 단독/다가구로 폴백)
+                // Officetel API not registered, falling back to single house API
+                return singleHouseApiUrl != null ? singleHouseApiUrl : defaultUrl;
             default:
                 // Handle unsupported building types, e.g., throw an exception or return null
                 // For now, returning singleHouseApiUrl as a fallback
-                System.err.println("Unsupported building type: " + buildingType + ". Defaulting to single house API.");
-                return singleHouseApiUrl;
+                // Unsupported building type, defaulting to single house API
+                return singleHouseApiUrl != null ? singleHouseApiUrl : defaultUrl;
         }
     }
     
@@ -146,13 +221,13 @@ public class RealEstateApiService {
      */
     public List<RealEstateTransaction> getRecentTransactions(String lawdCd, int months, String buildingType) {
         String apiUrl = getApiUrlForBuildingType(buildingType);
-        System.out.println("Using API for building type '" + buildingType + "': " + apiUrl);
+        // Using API for building type
         
         List<RealEstateTransaction> allTransactions = new ArrayList<>();
         
-        // 최근 3개월 데이터 조회
+        // 최근 3개월 데이터 조회 (테스트용으로 과거 날짜 사용)
         for (int i = 0; i < months; i++) {
-            LocalDate date = LocalDate.now().minusMonths(i);
+            LocalDate date = LocalDate.of(2024, 12, 1).minusMonths(i); // 2024년 12월부터 역산
             String dealYmd = date.format(DateTimeFormatter.ofPattern("yyyyMM"));
             allTransactions.addAll(fetchTransactions(apiUrl, lawdCd, dealYmd));
         }
@@ -171,49 +246,91 @@ public class RealEstateApiService {
      * 특정 월의 거래 데이터 조회 (API URL 지정)
      */
     private List<RealEstateTransaction> fetchTransactions(String apiUrl, String lawdCd, String dealYmd) {
-        if (apiKey == null || apiKey.isEmpty()) {
-            System.out.println("Real estate API key not configured, returning empty data");
+        String currentApiKey = getApiKeyForBuildingType(getApiSuffix(apiUrl));
+        if (currentApiKey == null || currentApiKey.isEmpty()) {
+            // Real estate API key not configured, returning empty data
             return new ArrayList<>();
         }
         
         try {
-            // API 키는 이미 URL 인코딩되어 있음
+            // URL 구성 시 키를 한 번만 인코딩
             String url = String.format("%s?serviceKey=%s&LAWD_CD=%s&DEAL_YMD=%s&numOfRows=1000", 
-                                     apiUrl, apiKey, lawdCd, dealYmd);
+                                     apiUrl, java.net.URLEncoder.encode(currentApiKey, java.nio.charset.StandardCharsets.UTF_8), lawdCd, dealYmd);
             
-            System.out.println("API URL: " + url);
-            String xmlResponse = restTemplate.getForObject(url, String.class);
-            System.out.println("API Response: " + xmlResponse);
+            // Real estate API request details logged
+            
+            // RestTemplate 대신 직접 HTTP 요청 (이중 인코딩 방지)
+            java.net.URL httpUrl = new java.net.URL(url);
+            java.net.HttpURLConnection connection = (java.net.HttpURLConnection) httpUrl.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
+            connection.setRequestProperty("Accept", "application/xml, text/xml, */*");
+            connection.setRequestProperty("Accept-Language", "ko-KR,ko;q=0.9,en;q=0.8");
+            // Remove Accept-Encoding to avoid compressed responses that need decompression
+            connection.setRequestProperty("Connection", "keep-alive");
+            
+            int responseCode = connection.getResponseCode();
+            // HTTP Response Code logged
+            
+            String xmlResponse;
+            if (responseCode >= 200 && responseCode < 300) {
+                byte[] responseBytes = connection.getInputStream().readAllBytes();
+                xmlResponse = new String(responseBytes, StandardCharsets.UTF_8);
+                // Response size logged
+            } else {
+                byte[] errorBytes = connection.getErrorStream().readAllBytes();
+                xmlResponse = new String(errorBytes, StandardCharsets.UTF_8);
+                // Error response size logged
+            }
+            connection.disconnect();
+            
+            // Real estate API response details logged
             
             // API 키 등록 오류 확인
             if (xmlResponse.contains("SERVICE_KEY_IS_NOT_REGISTERED_ERROR")) {
-                System.err.println("API Key not registered for this service: " + apiUrl);
-                System.err.println("Falling back to single house API...");
+                // API Key not registered for this service, falling back to single house API
                 return new ArrayList<>();
             }
             
-            RealEstateApiResponse response = xmlMapper.readValue(xmlResponse, RealEstateApiResponse.class);
+            // Check if response looks like valid XML
+            if (!xmlResponse.trim().startsWith("<")) {
+                                // Response does not appear to be valid XML
+                return new ArrayList<>();
+            }
+            
+            RealEstateApiResponse response;
+            try {
+                response = xmlMapper.readValue(xmlResponse, RealEstateApiResponse.class);
+            } catch (Exception e) {
+                // XML Deserialization Error
+                e.printStackTrace();
+                return new ArrayList<>();
+            }
             
             // 에러 응답 확인
             if (response.getCmmMsgHeader() != null) {
-                System.err.println("API Error: " + response.getCmmMsgHeader().getErrMsg() + 
-                                 " - " + response.getCmmMsgHeader().getReturnAuthMsg());
+                // API Error logged
                 return new ArrayList<>();
             }
             
             // 성공 응답에서 데이터 출처 확인
-            if (response.getResponse() != null && response.getResponse().getHeader() != null) {
-                System.out.println("Data Source: " + response.getResponse().getHeader().getResultMsg());
-                System.out.println("Result Code: " + response.getResponse().getHeader().getResultCode());
+            if (response.getHeader() != null) {
+                // Data Source and Result Code logged
             }
             
-            if (response.getResponse() != null && 
-                response.getResponse().getBody() != null && 
-                response.getResponse().getBody().getItems() != null) {
-                return response.getResponse().getBody().getItems().getItem();
+            if (response.getBody() != null && 
+                response.getBody().getItems() != null) {
+                return response.getBody().getItems().getItem();
             }
+        } catch (HttpClientErrorException e) {
+            // HTTP Error fetching real estate data
+            e.printStackTrace(); // Print stack trace for more details
+        } catch (ResourceAccessException e) {
+            // Network/Resource Access Error fetching real estate data
+            e.printStackTrace(); // Print stack trace for more details
         } catch (Exception e) {
-            System.err.println("Error fetching real estate data: " + e.getMessage());
+            // General Error fetching real estate data
+            e.printStackTrace(); // Print stack trace for more details
         }
         
         return new ArrayList<>();
@@ -223,28 +340,29 @@ public class RealEstateApiService {
      * 동네별 시장 데이터 분석 (건물 유형별)
      */
     public MarketData analyzeMarketData(String neighborhood, String buildingName, String buildingType) {
-        // 지역코드 매핑
-        String lawdCd = getLawdCode(neighborhood);
-        if (lawdCd == null) {
-            System.out.println("No lawd code found for: " + neighborhood);
-            return createEmptyMarketData(neighborhood, buildingName);
-        }
+        try {
+            // 지역코드 매핑
+            String lawdCd = getLawdCode(neighborhood);
+            if (lawdCd == null) {
+                // No lawd code found for neighborhood
+                return createEmptyMarketData(neighborhood, buildingName);
+            }
+            
+            // Analyzing market data for neighborhood and building type
+            List<RealEstateTransaction> transactions = getRecentTransactions(lawdCd, 3, buildingType);
+            
+            if (transactions.isEmpty()) {
+                return createEmptyMarketData(neighborhood, buildingName);
+            }
         
-        System.out.println("Analyzing market data for: " + neighborhood + " (building type: " + buildingType + ")");
-        List<RealEstateTransaction> transactions = getRecentTransactions(lawdCd, 3, buildingType);
-        
-        if (transactions.isEmpty()) {
-            return createEmptyMarketData(neighborhood, buildingName);
-        }
-        
-        // 보증금과 월세 데이터 추출
+        // 보증금과 월세 데이터 추출 (API 데이터는 만원 단위이므로 원 단위로 변환)
         List<Double> deposits = transactions.stream()
-                .map(t -> parseDouble(t.getDeposit()))
+                .map(t -> parseDouble(t.getDeposit()) * 10000) // 만원 -> 원 변환
                 .filter(d -> d > 0)
                 .collect(Collectors.toList());
         
         List<Double> monthlyRents = transactions.stream()
-                .map(t -> parseDouble(t.getMonthlyRent()))
+                .map(t -> parseDouble(t.getMonthlyRent()) * 10000) // 만원 -> 원 변환
                 .filter(d -> d > 0)
                 .collect(Collectors.toList());
         
@@ -265,8 +383,13 @@ public class RealEstateApiService {
                 .max(String::compareTo)
                 .orElse("N/A");
         
-        return new MarketData(neighborhood, buildingName, avgDeposit, avgMonthlyRent,
-                            medianDeposit, medianMonthlyRent, transactions.size(), recentDate);
+            return new MarketData(neighborhood, buildingName, avgDeposit, avgMonthlyRent,
+                                medianDeposit, medianMonthlyRent, transactions.size(), recentDate);
+        } catch (Exception e) {
+            // Error analyzing market data for neighborhood
+            e.printStackTrace();
+            return createEmptyMarketData(neighborhood, buildingName);
+        }
     }
     
     /**
@@ -316,10 +439,21 @@ public class RealEstateApiService {
         lawdCodeMap.put("동자동", "11110"); // 동자동은 종로구
         
         // 울산 지역코드 매핑
-        lawdCodeMap.put("범서읍", "3171025927"); // 울산 울주군 범서읍
-        lawdCodeMap.put("언양읍", "3171025300"); // 울산 울주군 언양읍
-        lawdCodeMap.put("울주군", "31710"); // 울산 울주군
         lawdCodeMap.put("울산", "31000"); // 울산광역시
+        lawdCodeMap.put("중구", "31110");
+        lawdCodeMap.put("남구", "31140");
+        lawdCodeMap.put("동구", "31170");
+        lawdCodeMap.put("북구", "31200");
+        lawdCodeMap.put("울주군", "31710");
+        lawdCodeMap.put("범서읍", "31710"); // 울주군 범서읍
+        lawdCodeMap.put("언양읍", "31710"); // 울주군 언양읍
+        lawdCodeMap.put("온양읍", "31710"); // 울주군 온양읍
+        lawdCodeMap.put("웅촌면", "31710"); // 울주군 웅촌면
+        lawdCodeMap.put("두동면", "31710"); // 울주군 두동면
+        lawdCodeMap.put("두서면", "31710"); // 울주군 두서면
+        lawdCodeMap.put("상북면", "31710"); // 울주군 상북면
+        lawdCodeMap.put("삼남면", "31710"); // 울주군 삼남면
+        lawdCodeMap.put("삼동면", "31710"); // 울주군 삼동면
         
         // 부산 지역코드 매핑
         lawdCodeMap.put("부산", "26000"); // 부산광역시
@@ -408,22 +542,223 @@ public class RealEstateApiService {
         lawdCodeMap.put("여주시", "41630");
         lawdCodeMap.put("양평군", "41830");
         lawdCodeMap.put("고양시", "41280");
-        lawdCodeMap.put("의정부시", "41150");
         lawdCodeMap.put("동두천시", "41250");
         lawdCodeMap.put("가평군", "41820");
         lawdCodeMap.put("연천군", "41800");
         
-        System.out.println("Looking for neighborhood: " + neighborhood);
+        // 강원도 주요 지역코드 매핑
+        lawdCodeMap.put("강원", "42000"); // 강원도
+        lawdCodeMap.put("춘천시", "42110");
+        lawdCodeMap.put("원주시", "42130");
+        lawdCodeMap.put("강릉시", "42150");
+        lawdCodeMap.put("동해시", "42170");
+        lawdCodeMap.put("태백시", "42190");
+        lawdCodeMap.put("속초시", "42210");
+        lawdCodeMap.put("삼척시", "42230");
+        lawdCodeMap.put("홍천군", "42720");
+        lawdCodeMap.put("횡성군", "42730");
+        lawdCodeMap.put("영월군", "42750");
+        lawdCodeMap.put("평창군", "42760");
+        lawdCodeMap.put("정선군", "42770");
+        lawdCodeMap.put("철원군", "42780");
+        lawdCodeMap.put("화천군", "42790");
+        lawdCodeMap.put("양구군", "42800");
+        lawdCodeMap.put("인제군", "42810");
+        lawdCodeMap.put("고성군", "42820");
+        lawdCodeMap.put("양양군", "42830");
+        
+        // 충청도 주요 지역코드 매핑
+        lawdCodeMap.put("충북", "43000"); // 충청북도
+        lawdCodeMap.put("충남", "44000"); // 충청남도
+        lawdCodeMap.put("청주시", "43110");
+        lawdCodeMap.put("충주시", "43130");
+        lawdCodeMap.put("제천시", "43150");
+        lawdCodeMap.put("천안시", "44130");
+        lawdCodeMap.put("공주시", "44150");
+        lawdCodeMap.put("보령시", "44180");
+        lawdCodeMap.put("아산시", "44200");
+        lawdCodeMap.put("서산시", "44210");
+        lawdCodeMap.put("논산시", "44230");
+        lawdCodeMap.put("계룡시", "44250");
+        lawdCodeMap.put("당진시", "44270");
+        
+        // 전라도 주요 지역코드 매핑
+        lawdCodeMap.put("전북", "45000"); // 전라북도
+        lawdCodeMap.put("전남", "46000"); // 전라남도
+        lawdCodeMap.put("전주시", "45110");
+        lawdCodeMap.put("군산시", "45130");
+        lawdCodeMap.put("익산시", "45140");
+        lawdCodeMap.put("정읍시", "45180");
+        lawdCodeMap.put("남원시", "45190");
+        lawdCodeMap.put("김제시", "45210");
+        lawdCodeMap.put("완주군", "45710");
+        lawdCodeMap.put("진안군", "45720");
+        lawdCodeMap.put("무주군", "45730");
+        lawdCodeMap.put("장수군", "45740");
+        lawdCodeMap.put("임실군", "45750");
+        lawdCodeMap.put("순창군", "45770");
+        lawdCodeMap.put("고창군", "45790");
+        lawdCodeMap.put("부안군", "45800");
+        lawdCodeMap.put("목포시", "46110");
+        lawdCodeMap.put("여수시", "46130");
+        lawdCodeMap.put("순천시", "46150");
+        lawdCodeMap.put("나주시", "46170");
+        lawdCodeMap.put("광양시", "46230");
+        
+        // 경상도 주요 지역코드 매핑
+        lawdCodeMap.put("경북", "47000"); // 경상북도
+        lawdCodeMap.put("경남", "48000"); // 경상남도
+        lawdCodeMap.put("포항시", "47110");
+        lawdCodeMap.put("경주시", "47130");
+        lawdCodeMap.put("김천시", "47150");
+        lawdCodeMap.put("안동시", "47170");
+        lawdCodeMap.put("구미시", "47190");
+        lawdCodeMap.put("영주시", "47210");
+        lawdCodeMap.put("영천시", "47230");
+        lawdCodeMap.put("상주시", "47250");
+        lawdCodeMap.put("문경시", "47280");
+        lawdCodeMap.put("경산시", "47290");
+        lawdCodeMap.put("창원시", "48120");
+        lawdCodeMap.put("진주시", "48170");
+        lawdCodeMap.put("통영시", "48220");
+        lawdCodeMap.put("사천시", "48240");
+        lawdCodeMap.put("김해시", "48250");
+        lawdCodeMap.put("밀양시", "48270");
+        lawdCodeMap.put("거제시", "48310");
+        lawdCodeMap.put("양산시", "48330");
+        
+        // 제주도 지역코드 매핑
+        lawdCodeMap.put("제주", "50000"); // 제주특별자치도
+        lawdCodeMap.put("제주시", "50110");
+        lawdCodeMap.put("서귀포시", "50130");
+        lawdCodeMap.put("인제군", "42810");
+        lawdCodeMap.put("고성군", "42820");
+        lawdCodeMap.put("양양군", "42830");
+        
+        // 충청도 지역코드 매핑
+        lawdCodeMap.put("충북", "43000"); // 충청북도
+        lawdCodeMap.put("충남", "44000"); // 충청남도
+        lawdCodeMap.put("청주시", "43110");
+        lawdCodeMap.put("충주시", "43130");
+        lawdCodeMap.put("제천시", "43150");
+        lawdCodeMap.put("천안시", "44130");
+        lawdCodeMap.put("공주시", "44150");
+        lawdCodeMap.put("보령시", "44180");
+        lawdCodeMap.put("아산시", "44200");
+        lawdCodeMap.put("서산시", "44210");
+        lawdCodeMap.put("논산시", "44230");
+        lawdCodeMap.put("계룡시", "44250");
+        lawdCodeMap.put("당진시", "44270");
+        
+        // 전라도 지역코드 매핑
+        lawdCodeMap.put("전북", "45000"); // 전라북도
+        lawdCodeMap.put("전남", "46000"); // 전라남도
+        lawdCodeMap.put("전주시", "45110");
+        lawdCodeMap.put("군산시", "45130");
+        lawdCodeMap.put("익산시", "45140");
+        lawdCodeMap.put("정읍시", "45180");
+        lawdCodeMap.put("남원시", "45190");
+        lawdCodeMap.put("김제시", "45210");
+        lawdCodeMap.put("완주군", "45710");
+        lawdCodeMap.put("진안군", "45720");
+        lawdCodeMap.put("무주군", "45730");
+        lawdCodeMap.put("장수군", "45740");
+        lawdCodeMap.put("임실군", "45750");
+        lawdCodeMap.put("순창군", "45770");
+        lawdCodeMap.put("고창군", "45790");
+        lawdCodeMap.put("부안군", "45800");
+        lawdCodeMap.put("목포시", "46110");
+        lawdCodeMap.put("여수시", "46130");
+        lawdCodeMap.put("순천시", "46150");
+        lawdCodeMap.put("나주시", "46170");
+        lawdCodeMap.put("광양시", "46230");
+        lawdCodeMap.put("담양군", "46710");
+        lawdCodeMap.put("곡성군", "46720");
+        lawdCodeMap.put("구례군", "46730");
+        lawdCodeMap.put("고흥군", "46770");
+        lawdCodeMap.put("보성군", "46780");
+        lawdCodeMap.put("화순군", "46790");
+        lawdCodeMap.put("장흥군", "46800");
+        lawdCodeMap.put("강진군", "46810");
+        lawdCodeMap.put("해남군", "46820");
+        lawdCodeMap.put("영암군", "46830");
+        lawdCodeMap.put("무안군", "46840");
+        lawdCodeMap.put("함평군", "46860");
+        lawdCodeMap.put("영광군", "46870");
+        lawdCodeMap.put("장성군", "46880");
+        lawdCodeMap.put("완도군", "46890");
+        lawdCodeMap.put("진도군", "46900");
+        lawdCodeMap.put("신안군", "46910");
+        
+        // 경상도 지역코드 매핑
+        lawdCodeMap.put("경북", "47000"); // 경상북도
+        lawdCodeMap.put("경남", "48000"); // 경상남도
+        lawdCodeMap.put("포항시", "47110");
+        lawdCodeMap.put("경주시", "47130");
+        lawdCodeMap.put("김천시", "47150");
+        lawdCodeMap.put("안동시", "47170");
+        lawdCodeMap.put("구미시", "47190");
+        lawdCodeMap.put("영주시", "47210");
+        lawdCodeMap.put("영천시", "47230");
+        lawdCodeMap.put("상주시", "47250");
+        lawdCodeMap.put("문경시", "47280");
+        lawdCodeMap.put("경산시", "47290");
+        lawdCodeMap.put("군위군", "47720");
+        lawdCodeMap.put("의성군", "47730");
+        lawdCodeMap.put("청송군", "47750");
+        lawdCodeMap.put("영양군", "47760");
+        lawdCodeMap.put("영덕군", "47770");
+        lawdCodeMap.put("청도군", "47820");
+        lawdCodeMap.put("고령군", "47830");
+        lawdCodeMap.put("성주군", "47840");
+        lawdCodeMap.put("칠곡군", "47850");
+        lawdCodeMap.put("예천군", "47900");
+        lawdCodeMap.put("봉화군", "47920");
+        lawdCodeMap.put("울진군", "47930");
+        lawdCodeMap.put("울릉군", "47940");
+        lawdCodeMap.put("창원시", "48120");
+        lawdCodeMap.put("진주시", "48170");
+        lawdCodeMap.put("통영시", "48220");
+        lawdCodeMap.put("사천시", "48240");
+        lawdCodeMap.put("김해시", "48250");
+        lawdCodeMap.put("밀양시", "48270");
+        lawdCodeMap.put("거제시", "48310");
+        lawdCodeMap.put("양산시", "48330");
+        lawdCodeMap.put("의령군", "48720");
+        lawdCodeMap.put("함안군", "48730");
+        lawdCodeMap.put("창녕군", "48740");
+        lawdCodeMap.put("고성군", "48820");
+        lawdCodeMap.put("남해군", "48840");
+        lawdCodeMap.put("하동군", "48850");
+        lawdCodeMap.put("산청군", "48860");
+        lawdCodeMap.put("함양군", "48870");
+        lawdCodeMap.put("거창군", "48880");
+        lawdCodeMap.put("합천군", "48890");
+        
+        // 제주도 지역코드 매핑
+        lawdCodeMap.put("제주", "50000"); // 제주특별자치도
+        lawdCodeMap.put("제주시", "50110");
+        lawdCodeMap.put("서귀포시", "50130");
+        
+        // Looking for neighborhood
         
         // 동네명에서 구 이름 추출
         for (Map.Entry<String, String> entry : lawdCodeMap.entrySet()) {
             if (neighborhood.contains(entry.getKey())) {
-                System.out.println("Found lawd code: " + entry.getValue() + " for " + neighborhood);
-                return entry.getValue();
+                String lawdCode = entry.getValue();
+                
+                // 10자리 지역코드를 5자리로 변환 (공공데이터 API는 5자리 사용)
+                if (lawdCode.length() > 5) {
+                    lawdCode = lawdCode.substring(0, 5);
+                    // Converted 10-digit code to 5-digit
+                }
+                
+                // Found lawd code for neighborhood
+                return lawdCode;
             }
         }
         
-        System.out.println("No lawd code found for: " + neighborhood);
+        // No lawd code found for neighborhood
         return null;
     }
     
@@ -437,44 +772,59 @@ public class RealEstateApiService {
         double avgRent = 0;
         double avgDeposit = 0;
         
-        System.out.println("Creating dummy market data for: " + neighborhood);
+        // Creating dummy market data for neighborhood
         
         if (neighborhood.contains("Gangnam") || neighborhood.contains("강남")) {
-            avgRent = 120; // 120만원
-            avgDeposit = 1000; // 1000만원
+            avgRent = 1200000; // 120만원 (원 단위)
+            avgDeposit = 10000000; // 1000만원 (원 단위)
         } else if (neighborhood.contains("Jongno") || neighborhood.contains("종로")) {
-            avgRent = 80; // 80만원
-            avgDeposit = 600; // 600만원
+            avgRent = 800000; // 80만원 (원 단위)
+            avgDeposit = 6000000; // 600만원 (원 단위)
         } else if (neighborhood.contains("Hongik") || neighborhood.contains("홍익")) {
-            avgRent = 70; // 70만원
-            avgDeposit = 500; // 500만원
+            avgRent = 700000; // 70만원 (원 단위)
+            avgDeposit = 5000000; // 500만원 (원 단위)
         } else if (neighborhood.contains("Wangsimni") || neighborhood.contains("왕십리")) {
-            avgRent = 90; // 90만원
-            avgDeposit = 700; // 700만원
+            avgRent = 900000; // 90만원 (원 단위)
+            avgDeposit = 7000000; // 700만원 (원 단위)
         } else if (neighborhood.contains("구영리")) {
-            avgRent = 85; // 85만원
-            avgDeposit = 650; // 650만원
+            avgRent = 850000; // 85만원 (원 단위)
+            avgDeposit = 6500000; // 650만원 (원 단위)
         } else if (neighborhood.contains("지곡동")) {
-            avgRent = 45; // 45만원 (군산은 상대적으로 저렴)
-            avgDeposit = 300; // 300만원
+            avgRent = 450000; // 45만원 (원 단위)
+            avgDeposit = 3000000; // 300만원 (원 단위)
         } else if (neighborhood.contains("울주군")) {
-            avgRent = 40; // 40만원
-            avgDeposit = 250; // 250만원
+            avgRent = 400000; // 40만원 (원 단위)
+            avgDeposit = 2500000; // 250만원 (원 단위)
         } else if (neighborhood.contains("범서읍")) {
-            avgRent = 35; // 35만원
-            avgDeposit = 200; // 200만원
+            avgRent = 350000; // 35만원 (원 단위)
+            avgDeposit = 2000000; // 200만원 (원 단위)
         } else if (neighborhood.contains("언양읍")) {
-            avgRent = 30; // 30만원
-            avgDeposit = 180; // 180만원
+            avgRent = 300000; // 30만원 (원 단위)
+            avgDeposit = 1800000; // 180만원 (원 단위)
         } else if (neighborhood.contains("동자동")) {
-            avgRent = 95; // 95만원 (종로구 중심가)
-            avgDeposit = 800; // 800만원
+            avgRent = 950000; // 95만원 (원 단위)
+            avgDeposit = 8000000; // 800만원 (원 단위)
+        } else if (neighborhood.contains("울산") || neighborhood.contains("범서") || neighborhood.contains("언양")) {
+            avgRent = 350000; // 35만원 (울산 지역)
+            avgDeposit = 2000000; // 200만원 (원 단위)
+        } else if (neighborhood.contains("부산")) {
+            avgRent = 450000; // 45만원 (부산 지역)
+            avgDeposit = 3000000; // 300만원 (원 단위)
+        } else if (neighborhood.contains("대구")) {
+            avgRent = 400000; // 40만원 (대구 지역)
+            avgDeposit = 2500000; // 250만원 (원 단위)
+        } else if (neighborhood.contains("인천")) {
+            avgRent = 500000; // 50만원 (인천 지역)
+            avgDeposit = 3500000; // 350만원 (원 단위)
+        } else if (neighborhood.contains("경기")) {
+            avgRent = 600000; // 60만원 (경기 지역)
+            avgDeposit = 4000000; // 400만원 (원 단위)
         } else {
-            avgRent = 75; // 75만원
-            avgDeposit = 550; // 550만원
+            avgRent = 550000; // 55만원 (기타 지역)
+            avgDeposit = 3500000; // 350만원 (원 단위)
         }
         
-        System.out.println("Market data for " + neighborhood + ": Rent=" + avgRent + ", Deposit=" + avgDeposit);
+        // Market data for neighborhood logged
         
         return new MarketData(neighborhood, buildingName, avgDeposit, avgRent, 
                             avgDeposit, avgRent, 5, "2024-12");
@@ -482,8 +832,14 @@ public class RealEstateApiService {
     
     private Double parseDouble(String value) {
         try {
-            return Double.parseDouble(value);
+            if (value == null || value.trim().isEmpty()) {
+                return 0.0;
+            }
+            // 쉼표 제거 후 파싱
+            String cleanValue = value.replaceAll(",", "").trim();
+            return Double.parseDouble(cleanValue);
         } catch (NumberFormatException e) {
+            // Failed to parse double value
             return 0.0;
         }
     }

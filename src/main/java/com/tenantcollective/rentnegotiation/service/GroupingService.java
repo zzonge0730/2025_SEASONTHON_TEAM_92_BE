@@ -82,25 +82,39 @@ public class GroupingService {
     }
     
     private Group createGroup(String groupId, String label, String scope, List<Tenant> tenants) {
-        List<Integer> rents = tenants.stream()
-                .map(Tenant::getCurrentRentKrw)
-                .collect(Collectors.toList());
-        
-        List<Integer> noticePcts = tenants.stream()
-                .map(Tenant::getIncreaseNoticePctOptional)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-        
-        double avgRent = StatisticsUtils.calculateAverage(rents);
-        double medianRent = StatisticsUtils.calculateMedian(rents);
-        double avgNoticePct = StatisticsUtils.calculateAverageNoticePct(noticePcts);
-        
-        // 시장 데이터 조회 (건물 유형별)
-        String neighborhood = tenants.get(0).getNeighborhood();
-        String buildingName = scope.equals("building") ? tenants.get(0).getBuildingName() : null;
-        String buildingType = tenants.get(0).getBuildingType();
-        MarketData marketData = realEstateApiService.analyzeMarketData(neighborhood, buildingName, buildingType);
-        
-        return new Group(groupId, label, scope, tenants.size(), avgRent, medianRent, avgNoticePct, marketData);
+        try {
+            List<Integer> rents = tenants.stream()
+                    .map(Tenant::getCurrentRentKrw)
+                    .collect(Collectors.toList());
+            
+            List<Integer> noticePcts = tenants.stream()
+                    .map(Tenant::getIncreaseNoticePctOptional)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+            
+            double avgRent = StatisticsUtils.calculateAverage(rents);
+            double medianRent = StatisticsUtils.calculateMedian(rents);
+            double avgNoticePct = StatisticsUtils.calculateAverageNoticePct(noticePcts);
+            
+            // 시장 데이터 조회 (건물 유형별) - 에러 발생 시 null로 처리
+            MarketData marketData = null;
+            try {
+                String neighborhood = tenants.get(0).getNeighborhood();
+                String buildingName = scope.equals("building") ? tenants.get(0).getBuildingName() : null;
+                String buildingType = tenants.get(0).getBuildingType();
+                marketData = realEstateApiService.analyzeMarketData(neighborhood, buildingName, buildingType);
+                System.out.println("Successfully created market data for group: " + groupId);
+            } catch (Exception e) {
+                System.err.println("Failed to create market data for group " + groupId + ": " + e.getMessage());
+                e.printStackTrace();
+                // marketData는 null로 유지하여 그룹 생성은 계속 진행
+            }
+            
+            return new Group(groupId, label, scope, tenants.size(), avgRent, medianRent, avgNoticePct, marketData);
+        } catch (Exception e) {
+            System.err.println("Error creating group " + groupId + ": " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Failed to create group: " + e.getMessage(), e);
+        }
     }
 }
