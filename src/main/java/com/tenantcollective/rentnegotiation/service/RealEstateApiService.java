@@ -8,6 +8,7 @@ import com.tenantcollective.rentnegotiation.util.StatisticsUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import jakarta.annotation.PostConstruct;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -26,13 +27,13 @@ public class RealEstateApiService {
     
     @Value("${realestate.api.url.single:}")
     private String singleHouseApiUrl;
-    
+
     @Value("${realestate.api.url.rowhouse:}")
     private String rowHouseApiUrl;
-    
+
     @Value("${realestate.api.url.officetel:}")
     private String officetelApiUrl;
-    
+
     @Value("${realestate.api.url.apartment:}")
     private String apartmentApiUrl;
     
@@ -40,7 +41,10 @@ public class RealEstateApiService {
         this.restTemplate = new RestTemplate();
         this.xmlMapper = new XmlMapper();
         this.dataValidationService = dataValidationService;
-        
+    }
+
+    @PostConstruct
+    public void init() {
         // API 정보 출력
         System.out.println("=== Real Estate API Information ===");
         System.out.println("Provider: 한국부동산원 (공공기관)");
@@ -85,6 +89,7 @@ public class RealEstateApiService {
             
             if (response.contains("SERVICE_KEY_IS_NOT_REGISTERED_ERROR")) {
                 System.out.println("❌ " + apiName + " API: 키 미등록");
+                System.out.println("Full API Response (Key Error): " + response);
             } else if (response.contains("NODATA_ERROR")) {
                 System.out.println("✅ " + apiName + " API: 키 등록됨 (데이터 없음)");
             } else {

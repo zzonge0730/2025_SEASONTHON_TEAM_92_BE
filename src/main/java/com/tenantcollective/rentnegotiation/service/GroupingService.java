@@ -24,14 +24,21 @@ public class GroupingService {
     }
     
     public List<Group> getGroups(String scope) {
-        List<Tenant> allTenants = tenantService.getAllTenants();
-        
-        if (scope.equals("building")) {
-            return groupByBuilding(allTenants);
-        } else if (scope.equals("neighborhood")) {
-            return groupByNeighborhood(allTenants);
-        } else {
-            throw new IllegalArgumentException("Invalid scope. Must be 'building' or 'neighborhood'");
+        try {
+            List<Tenant> allTenants = tenantService.getAllTenants();
+            System.out.println("Found " + allTenants.size() + " tenants for grouping");
+            
+            if (scope.equals("building")) {
+                return groupByBuilding(allTenants);
+            } else if (scope.equals("neighborhood")) {
+                return groupByNeighborhood(allTenants);
+            } else {
+                throw new IllegalArgumentException("Invalid scope. Must be 'building' or 'neighborhood'");
+            }
+        } catch (Exception e) {
+            System.err.println("Error in GroupingService.getGroups: " + e.getMessage());
+            e.printStackTrace();
+            return new ArrayList<>(); // 빈 리스트 반환으로 500 오류 방지
         }
     }
     
