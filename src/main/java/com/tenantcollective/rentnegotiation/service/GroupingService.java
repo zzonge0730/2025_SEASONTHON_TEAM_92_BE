@@ -88,10 +88,11 @@ public class GroupingService {
         double medianRent = StatisticsUtils.calculateMedian(rents);
         double avgNoticePct = StatisticsUtils.calculateAverageNoticePct(noticePcts);
         
-        // 시장 데이터 조회
+        // 시장 데이터 조회 (건물 유형별)
         String neighborhood = tenants.get(0).getNeighborhood();
         String buildingName = scope.equals("building") ? tenants.get(0).getBuildingName() : null;
-        MarketData marketData = realEstateApiService.analyzeMarketData(neighborhood, buildingName);
+        String buildingType = tenants.get(0).getBuildingType();
+        MarketData marketData = realEstateApiService.analyzeMarketData(neighborhood, buildingName, buildingType);
         
         return new Group(groupId, label, scope, tenants.size(), avgRent, medianRent, avgNoticePct, marketData);
     }

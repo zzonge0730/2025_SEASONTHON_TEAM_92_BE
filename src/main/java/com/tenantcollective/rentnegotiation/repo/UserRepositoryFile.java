@@ -22,7 +22,7 @@ public class UserRepositoryFile implements UserRepository {
     private final ObjectMapper objectMapper;
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
     
-    public UserRepositoryFile(@Value("${user.storage.file:storage/users.csv}") String filePath) {
+    public UserRepositoryFile(@Value("${user.storage.file:storage/users.json}") String filePath) {
         this.filePath = filePath;
         this.objectMapper = new ObjectMapper();
         this.objectMapper.registerModule(new JavaTimeModule());
@@ -83,7 +83,7 @@ public class UserRepositoryFile implements UserRepository {
         lock.readLock().lock();
         try {
             return loadUsers().stream()
-                    .filter(user -> user.getEmail().equalsIgnoreCase(email))
+                    .filter(user -> user.getEmail() != null && user.getEmail().equalsIgnoreCase(email))
                     .findFirst();
         } finally {
             lock.readLock().unlock();

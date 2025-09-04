@@ -2,6 +2,7 @@ package com.tenantcollective.rentnegotiation.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
 import java.time.LocalDateTime;
 
 public class User {
@@ -10,7 +11,11 @@ public class User {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime timestamp;
     
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email should be valid")
     private String email;
+    
+    @NotBlank(message = "Password is required")
     private String password;
     
     @NotBlank(message = "Nickname is required")
@@ -25,6 +30,9 @@ public class User {
     private Double latitude;
     private Double longitude;
     private String address;
+    private String neighborhood;
+    private String buildingName;
+    private Boolean profileCompleted = false;
     
     private Boolean active = true;
 
@@ -120,5 +128,29 @@ public class User {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getNeighborhood() {
+        return neighborhood;
+    }
+
+    public void setNeighborhood(String neighborhood) {
+        this.neighborhood = neighborhood;
+    }
+
+    public String getBuildingName() {
+        return buildingName;
+    }
+
+    public void setBuildingName(String buildingName) {
+        this.buildingName = buildingName;
+    }
+
+    public Boolean getProfileCompleted() {
+        return profileCompleted;
+    }
+
+    public void setProfileCompleted(Boolean profileCompleted) {
+        this.profileCompleted = profileCompleted;
     }
 }

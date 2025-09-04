@@ -5,6 +5,9 @@ import com.tenantcollective.rentnegotiation.model.AnonymousReport;
 import com.tenantcollective.rentnegotiation.model.Vote;
 import com.tenantcollective.rentnegotiation.service.AnonymousReportService;
 import com.tenantcollective.rentnegotiation.service.VoteService;
+import com.tenantcollective.rentnegotiation.service.InfoCardService;
+import com.tenantcollective.rentnegotiation.model.InfoCard;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,11 +24,13 @@ public class AdminController {
     
     private final AnonymousReportService anonymousReportService;
     private final VoteService voteService;
+    private final InfoCardService infoCardService;
     
     @Autowired
-    public AdminController(AnonymousReportService anonymousReportService, VoteService voteService) {
+    public AdminController(AnonymousReportService anonymousReportService, VoteService voteService, InfoCardService infoCardService) {
         this.anonymousReportService = anonymousReportService;
         this.voteService = voteService;
+        this.infoCardService = infoCardService;
     }
     
     @PostMapping("/login")
@@ -177,5 +182,16 @@ public class AdminController {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse<>(false, null, "투표 생성 실패: " + e.getMessage()));
         }
+    }
+
+    @PutMapping("/info-cards/{id}")
+    public ResponseEntity<ApiResponse<InfoCard>> updateInfoCard(@PathVariable String id, @RequestBody InfoCard infoCard) {
+        return ResponseEntity.ok(new ApiResponse<>(true, infoCardService.updateCard(id, infoCard)));
+    }
+
+    @DeleteMapping("/info-cards/{id}")
+    public ResponseEntity<ApiResponse<String>> deleteInfoCard(@PathVariable String id) {
+        infoCardService.deleteCard(id);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Info card deleted successfully"));
     }
 }

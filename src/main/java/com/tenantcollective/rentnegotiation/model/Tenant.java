@@ -13,6 +13,14 @@ public class Tenant {
     @NotBlank(message = "Building name is required")
     private String buildingName;
     
+    @NotBlank(message = "Building type is required")
+    @Pattern(regexp = "^(apartment|officetel|villa)$", message = "Building type must be apartment, officetel, or villa")
+    private String buildingType;
+    
+    @NotBlank(message = "Contract type is required")
+    @Pattern(regexp = "^(monthly|yearly)$", message = "Contract type must be monthly or yearly")
+    private String contractType;
+    
     @NotBlank(message = "Street address is required")
     private String streetAddress;
     
@@ -50,12 +58,14 @@ public class Tenant {
         this.timestamp = LocalDateTime.now();
     }
 
-    public Tenant(String buildingName, String streetAddress, String neighborhood, String city,
+    public Tenant(String buildingName, String buildingType, String contractType, String streetAddress, String neighborhood, String city,
                   Integer currentRentKrw, Integer depositKrw, String leaseEndYyyyMm,
                   Integer increaseNoticePctOptional, String landlordEmailOptional,
                   String painPointsFreeText, Boolean consentYesNo) {
         this();
         this.buildingName = buildingName;
+        this.buildingType = buildingType;
+        this.contractType = contractType;
         this.streetAddress = streetAddress;
         this.neighborhood = neighborhood;
         this.city = city;
@@ -91,6 +101,22 @@ public class Tenant {
 
     public void setBuildingName(String buildingName) {
         this.buildingName = buildingName;
+    }
+
+    public String getBuildingType() {
+        return buildingType;
+    }
+
+    public void setBuildingType(String buildingType) {
+        this.buildingType = buildingType;
+    }
+
+    public String getContractType() {
+        return contractType;
+    }
+
+    public void setContractType(String contractType) {
+        this.contractType = contractType;
     }
 
     public String getStreetAddress() {
