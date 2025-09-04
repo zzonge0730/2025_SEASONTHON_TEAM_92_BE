@@ -25,6 +25,10 @@ public class LetterRequest {
     
     @NotBlank(message = "Contact phone is required")
     private String contactPhone;
+    
+    private java.util.List<String> selectedPainPoints;
+    private java.util.List<String> selectedDiscussions;
+    private String customContent;
 
     public LetterRequest() {}
 
@@ -85,5 +89,29 @@ public class LetterRequest {
 
     public void setContactPhone(String contactPhone) {
         this.contactPhone = contactPhone;
+    }
+
+    public java.util.List<String> getSelectedPainPoints() {
+        return selectedPainPoints;
+    }
+
+    public void setSelectedPainPoints(java.util.List<String> selectedPainPoints) {
+        this.selectedPainPoints = selectedPainPoints;
+    }
+
+    public java.util.List<String> getSelectedDiscussions() {
+        return selectedDiscussions;
+    }
+
+    public void setSelectedDiscussions(java.util.List<String> selectedDiscussions) {
+        this.selectedDiscussions = selectedDiscussions;
+    }
+
+    public String getCustomContent() {
+        return customContent;
+    }
+
+    public void setCustomContent(String customContent) {
+        this.customContent = customContent;
     }
 }
