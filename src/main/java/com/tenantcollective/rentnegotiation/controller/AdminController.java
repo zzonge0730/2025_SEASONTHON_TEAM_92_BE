@@ -58,7 +58,7 @@ public class AdminController {
                     adminUser.setNeighborhood("시스템");
                     adminUser.setProfileCompleted(true);
                     adminUser.setActive(true);
-                    userService.save(adminUser);
+                    userService.saveUser(adminUser);
                 }
                 
                 Map<String, Object> responseData = new HashMap<>();
@@ -69,8 +69,8 @@ public class AdminController {
                 responseData.put("address", adminUser.getAddress());
                 responseData.put("buildingName", adminUser.getBuildingName());
                 responseData.put("neighborhood", adminUser.getNeighborhood());
-                responseData.put("profileCompleted", adminUser.isProfileCompleted());
-                responseData.put("active", adminUser.isActive());
+                responseData.put("profileCompleted", adminUser.getProfileCompleted());
+                responseData.put("active", adminUser.getActive());
                 
                 return ResponseEntity.ok(new ApiResponse<>(true, responseData));
             } else {

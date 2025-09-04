@@ -23,7 +23,7 @@ public class User {
     private String nickname;
     
     @NotBlank(message = "Role is required")
-    @Pattern(regexp = "^(tenant|landlord|anonymous)$", message = "Role must be tenant, landlord, or anonymous")
+    @Pattern(regexp = "^(tenant|landlord|anonymous|admin)$", message = "Role must be tenant, landlord, anonymous, or admin")
     private String role;
     
     // GPS location for verification
