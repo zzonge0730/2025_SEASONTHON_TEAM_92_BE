@@ -3,9 +3,11 @@ package com.tenantcollective.rentnegotiation.controller;
 import com.tenantcollective.rentnegotiation.model.ApiResponse;
 import com.tenantcollective.rentnegotiation.model.AnonymousReport;
 import com.tenantcollective.rentnegotiation.model.Vote;
+import com.tenantcollective.rentnegotiation.model.User;
 import com.tenantcollective.rentnegotiation.service.AnonymousReportService;
 import com.tenantcollective.rentnegotiation.service.VoteService;
 import com.tenantcollective.rentnegotiation.service.InfoCardService;
+import com.tenantcollective.rentnegotiation.service.UserService;
 import com.tenantcollective.rentnegotiation.model.InfoCard;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +27,14 @@ public class AdminController {
     private final AnonymousReportService anonymousReportService;
     private final VoteService voteService;
     private final InfoCardService infoCardService;
+    private final UserService userService;
     
     @Autowired
-    public AdminController(AnonymousReportService anonymousReportService, VoteService voteService, InfoCardService infoCardService) {
+    public AdminController(AnonymousReportService anonymousReportService, VoteService voteService, InfoCardService infoCardService, UserService userService) {
         this.anonymousReportService = anonymousReportService;
         this.voteService = voteService;
         this.infoCardService = infoCardService;
+        this.userService = userService;
     }
     
     @PostMapping("/login")
@@ -41,10 +45,32 @@ public class AdminController {
             
             // 간단한 관리자 인증 (실제로는 보안 강화 필요)
             if ("admin".equals(adminId) && "admin123".equals(password)) {
+                // 관리자 계정이 없으면 생성
+                User adminUser = userService.findByEmail("admin@system.com").orElse(null);
+                if (adminUser == null) {
+                    adminUser = new User();
+                    adminUser.setId("admin_001");
+                    adminUser.setEmail("admin@system.com");
+                    adminUser.setNickname("관리자");
+                    adminUser.setRole("admin");
+                    adminUser.setAddress("시스템 관리자");
+                    adminUser.setBuildingName("시스템");
+                    adminUser.setNeighborhood("시스템");
+                    adminUser.setProfileCompleted(true);
+                    adminUser.setActive(true);
+                    userService.save(adminUser);
+                }
+                
                 Map<String, Object> responseData = new HashMap<>();
-                responseData.put("id", "admin_001");
-                responseData.put("nickname", "관리자");
-                responseData.put("address", "시스템 관리자");
+                responseData.put("id", adminUser.getId());
+                responseData.put("email", adminUser.getEmail());
+                responseData.put("nickname", adminUser.getNickname());
+                responseData.put("role", adminUser.getRole());
+                responseData.put("address", adminUser.getAddress());
+                responseData.put("buildingName", adminUser.getBuildingName());
+                responseData.put("neighborhood", adminUser.getNeighborhood());
+                responseData.put("profileCompleted", adminUser.isProfileCompleted());
+                responseData.put("active", adminUser.isActive());
                 
                 return ResponseEntity.ok(new ApiResponse<>(true, responseData));
             } else {
