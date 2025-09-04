@@ -120,17 +120,19 @@ public class RealEstateApiService {
         }
         
         switch (buildingType.toLowerCase()) {
-            case "apartment":
-                // 아파트 API가 등록되지 않은 경우 단독다가구 API 사용
+            case "single": // 단독/다가구
                 return singleHouseApiUrl;
-            case "officetel":
-                // 오피스텔 API가 등록되지 않은 경우 단독다가구 API 사용
-                return singleHouseApiUrl;
-            case "villa":
-                // 연립다주택 API가 등록되지 않은 경우 단독다가구 API 사용
-                return singleHouseApiUrl;
+            case "rowhouse": // 연립다세대
+                return rowHouseApiUrl;
+            case "officetel": // 오피스텔
+                return officetelApiUrl;
+            case "apartment": // 아파트
+                return apartmentApiUrl;
             default:
-                return singleHouseApiUrl; // 단독/다가구 (확인된 API)
+                // Handle unsupported building types, e.g., throw an exception or return null
+                // For now, returning singleHouseApiUrl as a fallback
+                System.err.println("Unsupported building type: " + buildingType + ". Defaulting to single house API.");
+                return singleHouseApiUrl;
         }
     }
     
