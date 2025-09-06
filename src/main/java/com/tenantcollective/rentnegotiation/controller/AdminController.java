@@ -9,6 +9,7 @@ import com.tenantcollective.rentnegotiation.service.VoteService;
 import com.tenantcollective.rentnegotiation.service.InfoCardService;
 import com.tenantcollective.rentnegotiation.service.UserService;
 import com.tenantcollective.rentnegotiation.model.InfoCard;
+import com.tenantcollective.rentnegotiation.auth.JwtTokenProvider;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -28,13 +29,15 @@ public class AdminController {
     private final VoteService voteService;
     private final InfoCardService infoCardService;
     private final UserService userService;
+    private final JwtTokenProvider jwtTokenProvider;
     
     @Autowired
-    public AdminController(AnonymousReportService anonymousReportService, VoteService voteService, InfoCardService infoCardService, UserService userService) {
+    public AdminController(AnonymousReportService anonymousReportService, VoteService voteService, InfoCardService infoCardService, UserService userService, JwtTokenProvider jwtTokenProvider) {
         this.anonymousReportService = anonymousReportService;
         this.voteService = voteService;
         this.infoCardService = infoCardService;
         this.userService = userService;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
     
     @PostMapping("/login")
@@ -61,16 +64,16 @@ public class AdminController {
                     userService.saveUser(adminUser);
                 }
                 
+                // JWT 토큰 생성
+                String token = jwtTokenProvider.createToken(adminUser.getId(), adminUser.getEmail(), adminUser.getRole());
+                
+                System.out.println("🔑 관리자 JWT 토큰 생성 완료!");
+                System.out.println("👤 관리자: " + adminUser.getEmail() + " (ID: " + adminUser.getId() + ")");
+                System.out.println("🎫 토큰 길이: " + token.length() + " 문자");
+                
                 Map<String, Object> responseData = new HashMap<>();
-                responseData.put("id", adminUser.getId());
-                responseData.put("email", adminUser.getEmail());
-                responseData.put("nickname", adminUser.getNickname());
-                responseData.put("role", adminUser.getRole());
-                responseData.put("address", adminUser.getAddress());
-                responseData.put("buildingName", adminUser.getBuildingName());
-                responseData.put("neighborhood", adminUser.getNeighborhood());
-                responseData.put("profileCompleted", adminUser.getProfileCompleted());
-                responseData.put("active", adminUser.getActive());
+                responseData.put("user", adminUser);
+                responseData.put("token", token);
                 
                 return ResponseEntity.ok(new ApiResponse<>(true, responseData));
             } else {

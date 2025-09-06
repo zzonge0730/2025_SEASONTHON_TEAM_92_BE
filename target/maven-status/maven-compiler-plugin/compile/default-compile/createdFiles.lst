@@ -28,8 +28,10 @@ com/tenantcollective/rentnegotiation/controller/AdminController.class
 com/tenantcollective/rentnegotiation/model/ApiResponse.class
 com/tenantcollective/rentnegotiation/llm/OpenAiLlmClient.class
 com/tenantcollective/rentnegotiation/controller/VoteController.class
+com/tenantcollective/rentnegotiation/model/MissionResponse.class
 com/tenantcollective/rentnegotiation/controller/AnonymousReportController.class
 com/tenantcollective/rentnegotiation/model/SharedReport.class
+com/tenantcollective/rentnegotiation/model/WeeklyMission.class
 com/tenantcollective/rentnegotiation/repo/InfoCardRepositoryFile.class
 com/tenantcollective/rentnegotiation/repo/AnonymousReportRepository.class
 com/tenantcollective/rentnegotiation/model/RealEstateTransaction.class
@@ -45,6 +47,7 @@ com/tenantcollective/rentnegotiation/model/Group.class
 com/tenantcollective/rentnegotiation/service/GroupingService.class
 com/tenantcollective/rentnegotiation/controller/TenantController.class
 com/tenantcollective/rentnegotiation/repo/UserRepositoryFile.class
+com/tenantcollective/rentnegotiation/model/MissionQuestion.class
 com/tenantcollective/rentnegotiation/util/GroupIdGenerator.class
 com/tenantcollective/rentnegotiation/model/NegotiationTip.class
 com/tenantcollective/rentnegotiation/model/Tenant.class
@@ -53,6 +56,8 @@ com/tenantcollective/rentnegotiation/model/MarketData.class
 com/tenantcollective/rentnegotiation/repo/TenantRepository.class
 com/tenantcollective/rentnegotiation/model/AdvancedReport.class
 com/tenantcollective/rentnegotiation/DemoDataLoader.class
+com/tenantcollective/rentnegotiation/service/WeeklyMissionService.class
+com/tenantcollective/rentnegotiation/controller/WeeklyMissionController.class
 com/tenantcollective/rentnegotiation/model/RealEstateApiResponse$Body.class
 com/tenantcollective/rentnegotiation/config/LlmConfig.class
 com/tenantcollective/rentnegotiation/service/ProposalDiscussionService.class

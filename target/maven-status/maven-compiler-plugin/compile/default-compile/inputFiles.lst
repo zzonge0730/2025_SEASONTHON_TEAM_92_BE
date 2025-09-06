@@ -7,6 +7,7 @@
 /root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/repo/AnonymousReportRepository.java
 /root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/util/StatisticsUtils.java
 /root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/service/DiagnosisService.java
+/root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/controller/WeeklyMissionController.java
 /root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/util/GroupIdGenerator.java
 /root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/model/RealEstateApiResponse.java
 /root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/service/ReportService.java
@@ -16,8 +17,10 @@
 /root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/config/SecurityConfig.java
 /root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/service/GeoService.java
 /root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/repo/InfoCardRepositoryFile.java
+/root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/model/MissionResponse.java
 /root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/service/GroupingService.java
 /root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/model/AdvancedReport.java
+/root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/service/WeeklyMissionService.java
 /root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/model/IssueCategory.java
 /root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/controller/AuthController.java
 /root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/llm/OpenAiLlmClient.java
@@ -26,6 +29,7 @@
 /root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/service/ProposalDiscussionService.java
 /root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/repo/TenantRepositoryFile.java
 /root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/service/ReportSharingService.java
+/root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/model/MissionQuestion.java
 /root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/model/User.java
 /root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/service/AnonymousReportService.java
 /root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/model/LetterResponse.java
@@ -67,6 +71,7 @@
 /root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/repo/AnonymousReportRepositoryFile.java
 /root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/config/LlmConfig.java
 /root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/controller/TenantController.java
+/root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/model/WeeklyMission.java
 /root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/repo/VoteRepository.java
 /root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/model/RealEstateTransaction.java
 /root/2025_SEASONTHON_TEAM_92_BE/src/main/java/com/tenantcollective/rentnegotiation/llm/ClaudeLlmClient.java
