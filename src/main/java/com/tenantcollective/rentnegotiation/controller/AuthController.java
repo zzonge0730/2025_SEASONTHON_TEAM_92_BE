@@ -3,6 +3,7 @@ package com.tenantcollective.rentnegotiation.controller;
 import com.tenantcollective.rentnegotiation.auth.JwtTokenProvider;
 import com.tenantcollective.rentnegotiation.model.ApiResponse;
 import com.tenantcollective.rentnegotiation.model.User;
+import com.tenantcollective.rentnegotiation.model.UserUpdateRequest;
 import com.tenantcollective.rentnegotiation.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000", "https://houselent.vercel.app"})
+@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000", "http://172.21.135.200:3000", "https://houselent.vercel.app"})
 public class AuthController {
     
     private final UserService userService;
@@ -69,9 +70,9 @@ public class AuthController {
     }
     
     @PutMapping("/update")
-    public ResponseEntity<ApiResponse<User>> updateUser(@Valid @RequestBody User user) {
+    public ResponseEntity<ApiResponse<User>> updateUser(@Valid @RequestBody UserUpdateRequest userUpdateRequest) {
         try {
-            User updatedUser = userService.updateUser(user);
+            User updatedUser = userService.updateUser(userUpdateRequest);
             updatedUser.setPassword(null); // Do not send password back
             return ResponseEntity.ok(new ApiResponse<>(true, updatedUser));
         } catch (IllegalArgumentException e) {

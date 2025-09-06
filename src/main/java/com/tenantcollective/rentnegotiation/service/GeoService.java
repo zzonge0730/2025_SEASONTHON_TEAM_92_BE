@@ -89,10 +89,10 @@ public class GeoService {
                             System.out.println("✅ 선택된 주소: " + selectedAddress);
                             
                             // Remove building number for privacy protection
-                            String sanitizedAddress = sanitizeAddress(selectedAddress);
-                            System.out.println("✅ 최종 주소: " + sanitizedAddress);
+                            // String sanitizedAddress = sanitizeAddress(selectedAddress);
+                            System.out.println("✅ 최종 주소: " + selectedAddress);
                             System.out.println("=== VWorld API 호출 성공 ===");
-                            return sanitizedAddress;
+                            return selectedAddress; // 실제 주소 반환
                         } else {
                             System.out.println("❌ 주소를 찾을 수 없음 - Fallback으로 전환");
                         }

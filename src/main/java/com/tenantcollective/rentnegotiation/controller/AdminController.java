@@ -1,10 +1,10 @@
 package com.tenantcollective.rentnegotiation.controller;
 
 import com.tenantcollective.rentnegotiation.model.ApiResponse;
-import com.tenantcollective.rentnegotiation.model.AnonymousReport;
+import com.tenantcollective.rentnegotiation.model.AnonymousComplaint;
 import com.tenantcollective.rentnegotiation.model.Vote;
 import com.tenantcollective.rentnegotiation.model.User;
-import com.tenantcollective.rentnegotiation.service.AnonymousReportService;
+import com.tenantcollective.rentnegotiation.service.AnonymousComplaintService;
 import com.tenantcollective.rentnegotiation.service.VoteService;
 import com.tenantcollective.rentnegotiation.service.InfoCardService;
 import com.tenantcollective.rentnegotiation.service.UserService;
@@ -25,15 +25,15 @@ import java.util.Map;
 @CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000", "http://172.20.196.193:3000", "https://houselent.vercel.app", "https://houselent-3srqcm2ee-woohyeok-kangs-projects.vercel.app"})
 public class AdminController {
     
-    private final AnonymousReportService anonymousReportService;
+    private final AnonymousComplaintService anonymousComplaintService;
     private final VoteService voteService;
     private final InfoCardService infoCardService;
     private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
     
     @Autowired
-    public AdminController(AnonymousReportService anonymousReportService, VoteService voteService, InfoCardService infoCardService, UserService userService, JwtTokenProvider jwtTokenProvider) {
-        this.anonymousReportService = anonymousReportService;
+    public AdminController(AnonymousComplaintService anonymousComplaintService, VoteService voteService, InfoCardService infoCardService, UserService userService, JwtTokenProvider jwtTokenProvider) {
+        this.anonymousComplaintService = anonymousComplaintService;
         this.voteService = voteService;
         this.infoCardService = infoCardService;
         this.userService = userService;
@@ -87,9 +87,9 @@ public class AdminController {
     }
     
     @GetMapping("/reports")
-    public ResponseEntity<ApiResponse<List<AnonymousReport>>> getAllReports() {
+    public ResponseEntity<ApiResponse<List<AnonymousComplaint>>> getAllReports() {
         try {
-            List<AnonymousReport> reports = anonymousReportService.getAllReports();
+            List<AnonymousComplaint> reports = anonymousComplaintService.getAllComplaints();
             return ResponseEntity.ok(new ApiResponse<>(true, reports));
         } catch (Exception e) {
             return ResponseEntity.badRequest()
@@ -98,15 +98,15 @@ public class AdminController {
     }
     
     @PutMapping("/reports/{reportId}/verify")
-    public ResponseEntity<ApiResponse<String>> verifyReport(@PathVariable String reportId, @RequestBody Map<String, Boolean> request) {
+    public ResponseEntity<ApiResponse<String>> verifyReport(@PathVariable String reportId, @RequestBody Map<String, Object> request) {
         try {
-            Boolean verified = request.get("verified");
+            Boolean verified = (Boolean) request.get("verified");
             if (verified == null) {
                 return ResponseEntity.badRequest()
                         .body(new ApiResponse<>(false, null, "검증 상태가 필요합니다"));
             }
             
-            boolean success = anonymousReportService.updateReportVerification(reportId, verified);
+            boolean success = anonymousComplaintService.updateComplaintVerification(reportId, verified, "admin");
             if (success) {
                 return ResponseEntity.ok(new ApiResponse<>(true, "신고 검증 상태가 업데이트되었습니다"));
             } else {

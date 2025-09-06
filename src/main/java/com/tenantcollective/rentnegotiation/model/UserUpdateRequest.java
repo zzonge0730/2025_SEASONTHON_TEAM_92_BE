@@ -2,10 +2,9 @@ package com.tenantcollective.rentnegotiation.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
-import jakarta.validation.constraints.Email;
 import java.time.LocalDateTime;
 
-public class User {
+public class UserUpdateRequest {
     private String id;
     
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
@@ -15,7 +14,7 @@ public class User {
     @Email(message = "Email should be valid")
     private String email;
     
-    @NotBlank(message = "Password is required")
+    // Password is optional for updates
     private String password;
     
     @NotBlank(message = "Nickname is required")
@@ -39,15 +38,14 @@ public class User {
     private Boolean active = true;
 
     // Constructors
-    public User() {
+    public UserUpdateRequest() {
         this.timestamp = LocalDateTime.now();
         this.role = "tenant"; // 기본값을 세입자로 설정
     }
 
-    public User(String email, String password, String nickname, String role) {
+    public UserUpdateRequest(String email, String nickname, String role) {
         this();
         this.email = email;
-        this.password = password;
         this.nickname = nickname;
         this.role = role;
     }

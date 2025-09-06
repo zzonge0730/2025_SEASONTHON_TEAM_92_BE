@@ -1,6 +1,7 @@
 package com.tenantcollective.rentnegotiation.service;
 
 import com.tenantcollective.rentnegotiation.model.User;
+import com.tenantcollective.rentnegotiation.model.UserUpdateRequest;
 import com.tenantcollective.rentnegotiation.repo.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -87,6 +88,50 @@ public class UserService {
         }
         if (user.getActive() != null) {
             existingUser.setActive(user.getActive());
+        }
+        
+        return userRepository.save(existingUser);
+    }
+    
+    public User updateUser(UserUpdateRequest userUpdateRequest) {
+        User existingUser = userRepository.findById(userUpdateRequest.getId())
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userUpdateRequest.getId()));
+        
+        // Update fields that are allowed to be updated
+        if (userUpdateRequest.getNickname() != null) {
+            existingUser.setNickname(userUpdateRequest.getNickname());
+        }
+        if (userUpdateRequest.getAddress() != null) {
+            existingUser.setAddress(userUpdateRequest.getAddress());
+        }
+        if (userUpdateRequest.getNeighborhood() != null) {
+            existingUser.setNeighborhood(userUpdateRequest.getNeighborhood());
+        }
+        if (userUpdateRequest.getBuildingName() != null) {
+            existingUser.setBuildingName(userUpdateRequest.getBuildingName());
+        }
+        if (userUpdateRequest.getLatitude() != null) {
+            existingUser.setLatitude(userUpdateRequest.getLatitude());
+        }
+        if (userUpdateRequest.getLongitude() != null) {
+            existingUser.setLongitude(userUpdateRequest.getLongitude());
+        }
+        if (userUpdateRequest.getProfileCompleted() != null) {
+            existingUser.setProfileCompleted(userUpdateRequest.getProfileCompleted());
+        }
+        if (userUpdateRequest.getDiagnosisCompleted() != null) {
+            existingUser.setDiagnosisCompleted(userUpdateRequest.getDiagnosisCompleted());
+        }
+        if (userUpdateRequest.getOnboardingCompleted() != null) {
+            existingUser.setOnboardingCompleted(userUpdateRequest.getOnboardingCompleted());
+        }
+        if (userUpdateRequest.getActive() != null) {
+            existingUser.setActive(userUpdateRequest.getActive());
+        }
+        
+        // Only update password if provided
+        if (userUpdateRequest.getPassword() != null && !userUpdateRequest.getPassword().trim().isEmpty()) {
+            existingUser.setPassword(passwordEncoder.encode(userUpdateRequest.getPassword()));
         }
         
         return userRepository.save(existingUser);
