@@ -16,7 +16,14 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000", "http://172.21.135.200:3000", "https://houselent.vercel.app"})
+@CrossOrigin(origins = {
+    "http://localhost:3000", 
+    "http://127.0.0.1:3000", 
+    "http://172.21.135.200:3000",
+    "https://houselent.vercel.app", 
+    "https://houselent-3srqcm2ee-woohyeok-kangs-projects.vercel.app",
+    "https://*.vercel.app" // Vercel 배포 도메인 허용
+})
 public class AuthController {
     
     private final UserService userService;

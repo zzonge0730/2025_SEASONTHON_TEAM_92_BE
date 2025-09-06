@@ -19,7 +19,10 @@ public class CorsConfig implements WebMvcConfigurer {
                 .allowedOrigins(
                     "http://localhost:3000", 
                     "http://127.0.0.1:3000",
+                    "http://172.21.135.200:3000",
                     "https://2025-seasonthon-team-92-fe.vercel.app",
+                    "https://houselent.vercel.app",
+                    "https://houselent-3srqcm2ee-woohyeok-kangs-projects.vercel.app",
                     "https://*.vercel.app"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
@@ -34,7 +37,10 @@ public class CorsConfig implements WebMvcConfigurer {
         configuration.setAllowedOriginPatterns(Arrays.asList(
             "http://localhost:3000", 
             "http://127.0.0.1:3000",
+            "http://172.21.135.200:3000",
             "https://2025-seasonthon-team-92-fe.vercel.app",
+            "https://houselent.vercel.app",
+            "https://houselent-3srqcm2ee-woohyeok-kangs-projects.vercel.app",
             "https://*.vercel.app"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
