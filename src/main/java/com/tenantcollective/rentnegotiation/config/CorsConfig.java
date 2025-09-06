@@ -18,12 +18,17 @@ public class CorsConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins(
                     "http://localhost:3000", 
+                    "http://localhost:3001",
                     "http://127.0.0.1:3000",
+                    "http://127.0.0.1:3001",
                     "http://172.21.135.200:3000",
+                    "https://d3b5339e4b2d.ngrok-free.app",
                     "https://2025-seasonthon-team-92-fe.vercel.app",
                     "https://houselent.vercel.app",
                     "https://houselent-3srqcm2ee-woohyeok-kangs-projects.vercel.app",
-                    "https://*.vercel.app"
+                    "https://*.vercel.app",
+                    "https://*.ngrok-free.app",
+                    "https://*.ngrok.io"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
@@ -36,12 +41,17 @@ public class CorsConfig implements WebMvcConfigurer {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(Arrays.asList(
             "http://localhost:3000", 
+            "http://localhost:3001",
             "http://127.0.0.1:3000",
+            "http://127.0.0.1:3001",
             "http://172.21.135.200:3000",
+            "https://d3b5339e4b2d.ngrok-free.app",
             "https://2025-seasonthon-team-92-fe.vercel.app",
             "https://houselent.vercel.app",
             "https://houselent-3srqcm2ee-woohyeok-kangs-projects.vercel.app",
-            "https://*.vercel.app"
+            "https://*.vercel.app",
+            "https://*.ngrok-free.app",
+            "https://*.ngrok.io"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
