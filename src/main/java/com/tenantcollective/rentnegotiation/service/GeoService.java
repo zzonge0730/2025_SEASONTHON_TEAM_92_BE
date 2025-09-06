@@ -21,22 +21,31 @@ public class GeoService {
     }
 
     public String getFullAddressFromCoordinates(double longitude, double latitude) {
+        System.out.println("=== VWorld API 호출 시작 ===");
+        System.out.println("입력 좌표 - 경도: " + longitude + ", 위도: " + latitude);
+        
         try {
             // Use Geocoder 2.0 API for better address resolution
             String url = String.format("%s?service=address&request=GetAddress&version=2.0&crs=epsg:4326&point=%f,%f&format=json&type=both&zipcode=false&simple=false&key=%s",
                     apiUrl, longitude, latitude, apiKey);
 
-            System.out.println("VWorld Geocoder API URL: " + url);
+            System.out.println("VWorld API URL: " + url);
+            System.out.println("API Key: " + apiKey);
+            
             String response = restTemplate.getForObject(url, String.class);
-            System.out.println("VWorld Geocoder API Response: " + response);
+            System.out.println("VWorld API 응답 길이: " + (response != null ? response.length() : "null"));
+            System.out.println("VWorld API 응답 내용: " + response);
 
             JSONObject jsonResponse = new JSONObject(response);
             
             // Check for error response first
             if (jsonResponse.has("response") && jsonResponse.getJSONObject("response").has("status")) {
                 String status = jsonResponse.getJSONObject("response").getString("status");
+                System.out.println("API 응답 상태: " + status);
                 if ("ERROR".equals(status)) {
-                    System.err.println("VWorld Geocoder API Error: " + jsonResponse.toString());
+                    System.err.println("❌ VWorld API 오류 발생!");
+                    System.err.println("오류 응답: " + jsonResponse.toString());
+                    System.out.println("Fallback 주소로 전환: " + getFallbackAddress(longitude, latitude));
                     return getFallbackAddress(longitude, latitude);
                 }
             }
@@ -45,10 +54,12 @@ public class GeoService {
             if (jsonResponse.has("response") && 
                 jsonResponse.getJSONObject("response").has("result")) {
                 
+                System.out.println("✅ API 응답 구조 정상");
                 // result is a JSONArray, not JSONObject
                 JSONObject responseObj = jsonResponse.getJSONObject("response");
                 if (responseObj.get("result") instanceof org.json.JSONArray) {
                     org.json.JSONArray resultArray = responseObj.getJSONArray("result");
+                    System.out.println("결과 배열 길이: " + resultArray.length());
                     if (resultArray.length() > 0) {
                         // Prefer road address over parcel address for better privacy
                         String roadAddress = null;
@@ -75,24 +86,30 @@ public class GeoService {
                         // Use road address if available, otherwise use parcel address
                         String selectedAddress = roadAddress != null ? roadAddress : parcelAddress;
                         if (selectedAddress != null) {
-                            System.out.println("Selected address: " + selectedAddress);
+                            System.out.println("✅ 선택된 주소: " + selectedAddress);
                             
                             // Remove building number for privacy protection
                             String sanitizedAddress = sanitizeAddress(selectedAddress);
-                            System.out.println("Sanitized address: " + sanitizedAddress);
+                            System.out.println("✅ 최종 주소: " + sanitizedAddress);
+                            System.out.println("=== VWorld API 호출 성공 ===");
                             return sanitizedAddress;
+                        } else {
+                            System.out.println("❌ 주소를 찾을 수 없음 - Fallback으로 전환");
                         }
                     }
                 }
             } else {
-                System.err.println("Unexpected API response structure: " + response);
+                System.err.println("❌ 예상치 못한 API 응답 구조: " + response);
             }
         } catch (Exception e) {
             // Log the error in a real application
-            System.err.println("Reverse geocoding failed: " + e.getMessage());
+            System.err.println("❌ VWorld API 호출 실패: " + e.getMessage());
+            System.err.println("예외 타입: " + e.getClass().getSimpleName());
             e.printStackTrace();
         }
         
+        System.out.println("❌ Fallback 주소 사용: " + getFallbackAddress(longitude, latitude));
+        System.out.println("=== VWorld API 호출 종료 ===");
         return getFallbackAddress(longitude, latitude);
     }
     
@@ -132,7 +149,9 @@ public class GeoService {
     }
     
     public String getDongFromCoordinates(double longitude, double latitude) {
+        System.out.println("🏘️ getDongFromCoordinates 호출 - 경도: " + longitude + ", 위도: " + latitude);
         String fullAddress = getFullAddressFromCoordinates(longitude, latitude);
+        System.out.println("🏠 getDongFromCoordinates에서 받은 주소: " + fullAddress);
         if (fullAddress != null && !fullAddress.isEmpty()) {
             // Parse address to extract dong
             // e.g., "울산광역시 울주군 범서읍 구영리 산 163-13"
@@ -156,10 +175,15 @@ public class GeoService {
     }
     
     private String getFallbackAddress(double longitude, double latitude) {
+        System.out.println("🔄 Fallback 주소 생성 중...");
+        System.out.println("좌표 범위 체크 - 경도: " + longitude + " (126.9~127.1), 위도: " + latitude + " (37.4~37.7)");
+        
         // Fallback: return a default address based on coordinates (privacy-protected)
         if (longitude >= 126.9 && longitude <= 127.1 && latitude >= 37.4 && latitude <= 37.7) {
+            System.out.println("⚠️ 서울 지역 범위에 해당 - 강남구로 설정");
             return "서울특별시 강남구"; // Default to Gangnam area (no specific building)
         }
+        System.out.println("⚠️ 서울 지역 범위 밖 - 기본 메시지 반환");
         return "위치 확인 중"; // Default fallback
     }
     

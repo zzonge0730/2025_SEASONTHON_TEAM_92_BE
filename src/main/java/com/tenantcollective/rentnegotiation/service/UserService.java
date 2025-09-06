@@ -53,6 +53,45 @@ public class UserService {
         return userRepository.save(user);
     }
     
+    public User updateUser(User user) {
+        User existingUser = userRepository.findById(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + user.getId()));
+        
+        // Update fields that are allowed to be updated
+        if (user.getNickname() != null) {
+            existingUser.setNickname(user.getNickname());
+        }
+        if (user.getAddress() != null) {
+            existingUser.setAddress(user.getAddress());
+        }
+        if (user.getNeighborhood() != null) {
+            existingUser.setNeighborhood(user.getNeighborhood());
+        }
+        if (user.getBuildingName() != null) {
+            existingUser.setBuildingName(user.getBuildingName());
+        }
+        if (user.getLatitude() != null) {
+            existingUser.setLatitude(user.getLatitude());
+        }
+        if (user.getLongitude() != null) {
+            existingUser.setLongitude(user.getLongitude());
+        }
+        if (user.getProfileCompleted() != null) {
+            existingUser.setProfileCompleted(user.getProfileCompleted());
+        }
+        if (user.getDiagnosisCompleted() != null) {
+            existingUser.setDiagnosisCompleted(user.getDiagnosisCompleted());
+        }
+        if (user.getOnboardingCompleted() != null) {
+            existingUser.setOnboardingCompleted(user.getOnboardingCompleted());
+        }
+        if (user.getActive() != null) {
+            existingUser.setActive(user.getActive());
+        }
+        
+        return userRepository.save(existingUser);
+    }
+    
     public Optional<User> findUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }

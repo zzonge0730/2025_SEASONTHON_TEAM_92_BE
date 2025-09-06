@@ -33,6 +33,8 @@ public class User {
     private String neighborhood;
     private String buildingName;
     private Boolean profileCompleted = false;
+    private Boolean diagnosisCompleted = false;
+    private Boolean onboardingCompleted = false;
     
     private Boolean active = true;
 
@@ -152,5 +154,21 @@ public class User {
 
     public void setProfileCompleted(Boolean profileCompleted) {
         this.profileCompleted = profileCompleted;
+    }
+
+    public Boolean getDiagnosisCompleted() {
+        return diagnosisCompleted;
+    }
+
+    public void setDiagnosisCompleted(Boolean diagnosisCompleted) {
+        this.diagnosisCompleted = diagnosisCompleted;
+    }
+
+    public Boolean getOnboardingCompleted() {
+        return onboardingCompleted;
+    }
+
+    public void setOnboardingCompleted(Boolean onboardingCompleted) {
+        this.onboardingCompleted = onboardingCompleted;
     }
 }
